@@ -11,6 +11,8 @@ export type CameraPreset =
   | "Left Sideview"
   | "Right Sideview"
   | "Front"
+  | "Back"
+  | "Bottom"
   | "Top Center Angled"
 
 export interface CameraAnimationConfig {

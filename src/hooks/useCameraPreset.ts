@@ -1,12 +1,12 @@
 import { useCallback, RefObject } from "react"
-import type { CameraPreset, CameraController } from "./cameraAnimation"
+import { useCameraController } from "../contexts/CameraControllerContext"
+import type { CameraPreset } from "./cameraAnimation"
 
 interface UseCameraPresetProps {
   setAutoRotate: (value: boolean) => void
   setAutoRotateUserToggled: (value: boolean) => void
   setCameraPreset: (preset: CameraPreset) => void
   closeMenu: () => void
-  cameraControllerRef: RefObject<CameraController | null>
   isAnimatingRef: RefObject<boolean>
   lastPresetSelectTime: RefObject<number>
 }
@@ -16,13 +16,13 @@ export function useCameraPreset({
   setAutoRotateUserToggled,
   setCameraPreset,
   closeMenu,
-  cameraControllerRef,
   isAnimatingRef,
   lastPresetSelectTime,
 }: UseCameraPresetProps) {
+  const { controller } = useCameraController()
+
   const handleCameraPresetSelect = useCallback(
     (preset: CameraPreset) => {
-      // Stop auto-rotate when a preset is selected
       setAutoRotate(false)
       setAutoRotateUserToggled(true)
 
@@ -33,19 +33,18 @@ export function useCameraPreset({
       if (preset === "Custom") return
 
       isAnimatingRef.current = true
-      cameraControllerRef.current?.animateToPreset(preset)
+      controller?.animateToPreset(preset)
 
-      // Reset the animation flag after the animation would be complete
       setTimeout(() => {
         isAnimatingRef.current = false
-      }, 600) // Match this with the animation duration in useCameraController
+      }, 600)
     },
     [
       setAutoRotate,
       setAutoRotateUserToggled,
       setCameraPreset,
       closeMenu,
-      cameraControllerRef,
+      controller,
       isAnimatingRef,
       lastPresetSelectTime,
     ],

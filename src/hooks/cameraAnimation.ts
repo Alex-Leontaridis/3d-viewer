@@ -15,6 +15,8 @@ export type CameraPreset =
   | "Left Sideview"
   | "Right Sideview"
   | "Front"
+  | "Back"
+  | "Bottom"
   | "Top Center Angled"
 
 export interface CameraAnimationConfig {
@@ -46,6 +48,7 @@ export const CameraAnimatorWithContext: React.FC = () => {
     toQuaternion: THREE.Quaternion
     rollFrom: THREE.Quaternion
     rollTo: THREE.Quaternion
+    finalUp: THREE.Vector3
     startTime: number
     duration: number
   } | null>(null)
@@ -113,6 +116,7 @@ export const CameraAnimatorWithContext: React.FC = () => {
         toQuaternion,
         rollFrom,
         rollTo,
+        finalUp: resolvedUp.clone(),
         startTime: performance.now(),
         duration: durationMs,
       }
@@ -153,6 +157,7 @@ export const CameraAnimatorWithContext: React.FC = () => {
       toQuaternion,
       rollFrom,
       rollTo,
+      finalUp,
       startTime,
       duration,
     } = animationRef.current
@@ -206,7 +211,7 @@ export const CameraAnimatorWithContext: React.FC = () => {
     if (progress >= 1) {
       mainCameraRef.current.position.copy(toPosition)
       mainCameraRef.current.quaternion.copy(toQuaternion)
-      mainCameraRef.current.up.set(0, 0, 1)
+      mainCameraRef.current.up.copy(finalUp)
       mainCameraRef.current.updateMatrixWorld()
       controlsRef.current?.target.copy(toTarget)
       controlsRef.current?.update()

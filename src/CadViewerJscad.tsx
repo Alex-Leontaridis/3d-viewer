@@ -5,7 +5,7 @@ import { forwardRef, useMemo } from "react"
 import type * as THREE from "three"
 import { AnyCadComponent } from "./AnyCadComponent"
 import { CadViewerContainer } from "./CadViewerContainer"
-import type { CameraController } from "./hooks/cameraAnimation"
+import type { CameraController, CameraPreset } from "./hooks/cameraAnimation"
 import { useConvertChildrenToCircuitJson } from "./hooks/use-convert-children-to-soup"
 import { useStlsFromGeom } from "./hooks/use-stls-from-geom"
 import { useBoardGeomBuilder } from "./hooks/useBoardGeomBuilder"
@@ -27,6 +27,7 @@ interface Props {
   cameraType?: "orthographic" | "perspective"
   onUserInteraction?: () => void
   onCameraControllerReady?: (controller: CameraController | null) => void
+  onCameraPresetSelect?: (preset: CameraPreset) => void
   resolveStaticAsset?: (modelUrl: string) => string
 }
 
@@ -42,6 +43,7 @@ export const CadViewerJscad = forwardRef<
       clickToInteractEnabled,
       onUserInteraction,
       onCameraControllerReady,
+      onCameraPresetSelect,
       resolveStaticAsset,
     },
     ref,
@@ -134,6 +136,7 @@ export const CadViewerJscad = forwardRef<
         boardCenter={boardCenter}
         onUserInteraction={onUserInteraction}
         onCameraControllerReady={onCameraControllerReady}
+        onCameraPresetSelect={onCameraPresetSelect}
       >
         {boardStls.map(({ stlData, color, layerType }, index) => (
           <VisibleSTLModel

@@ -43,7 +43,6 @@ const CadViewerInner = (props: any) => {
   const { visibility, setLayerVisibility } = useLayerVisibility()
   const { showToast } = useToast()
 
-  const cameraControllerRef = useRef<CameraController | null>(null)
   const externalCameraControllerReady = props.onCameraControllerReady as
     | ((controller: CameraController | null) => void)
     | undefined
@@ -96,7 +95,6 @@ const CadViewerInner = (props: any) => {
 
   const handleCameraControllerReady = useCallback(
     (controller: CameraController | null) => {
-      cameraControllerRef.current = controller
       externalCameraControllerReady?.(controller)
       if (controller && cameraPreset !== "Custom") {
         controller.animateToPreset(cameraPreset)
@@ -110,7 +108,6 @@ const CadViewerInner = (props: any) => {
     setAutoRotateUserToggled,
     setCameraPreset,
     closeMenu,
-    cameraControllerRef,
     isAnimatingRef,
     lastPresetSelectTime,
   })
@@ -234,6 +231,7 @@ const CadViewerInner = (props: any) => {
         cameraType={cameraType}
         onUserInteraction={handleUserInteraction}
         onCameraControllerReady={handleCameraControllerReady}
+        onCameraPresetSelect={handleCameraPresetSelect}
       />
       {menuVisible && (
         <ContextMenu

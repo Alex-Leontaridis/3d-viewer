@@ -7,10 +7,13 @@ import { OrbitControls } from "./react-three/OrbitControls"
 import { Grid } from "./react-three/Grid"
 import { useFrame, useThree } from "./react-three/ThreeContext"
 import { Lights } from "./react-three/Lights"
-import { CameraAnimatorWithContext } from "./hooks/cameraAnimation"
+import {
+  CameraAnimatorWithContext,
+  type CameraController,
+  type CameraPreset,
+} from "./hooks/cameraAnimation"
 import { useCameraController } from "./contexts/CameraControllerContext"
 import { useCameraSession } from "./hooks/useCameraSession"
-import type { CameraController } from "./hooks/cameraAnimation"
 import { OrientationCubeCanvas } from "./three-components/OrientationCubeCanvas"
 import { zIndexMap } from "../lib/utils/z-index-map"
 
@@ -43,6 +46,7 @@ interface Props {
   boardCenter?: { x: number; y: number }
   onUserInteraction?: () => void
   onCameraControllerReady?: (controller: CameraController | null) => void
+  onCameraPresetSelect?: (preset: CameraPreset) => void
 }
 
 export const CadViewerContainer = forwardRef<
@@ -59,6 +63,7 @@ export const CadViewerContainer = forwardRef<
       boardCenter,
       onUserInteraction,
       onCameraControllerReady,
+      onCameraPresetSelect,
     },
     ref,
   ) => {
@@ -95,7 +100,10 @@ export const CadViewerContainer = forwardRef<
 
     return (
       <div style={{ position: "relative", width: "100%", height: "100%" }}>
-        <OrientationCubeCanvas />
+        <OrientationCubeCanvas
+          onCameraPresetSelect={onCameraPresetSelect}
+          onUserInteraction={onUserInteraction}
+        />
         <Canvas
           ref={ref}
           style={{ backgroundColor: CANVAS_BACKGROUND }}

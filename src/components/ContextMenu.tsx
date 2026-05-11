@@ -28,6 +28,8 @@ const cameraOptions: CameraPreset[] = [
   "Left Sideview",
   "Right Sideview",
   "Front",
+  "Back",
+  "Bottom",
 ]
 
 const contentStyles: React.CSSProperties = {
