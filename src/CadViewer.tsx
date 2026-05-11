@@ -6,7 +6,6 @@ import * as THREE from "three"
 const DEFAULT_TARGET = new THREE.Vector3(0, 0, 0)
 const INITIAL_CAMERA_POSITION = [5, -5, 5] as const
 import { CadViewerJscad } from "./CadViewerJscad"
-import CadViewerManifold from "./CadViewerManifold"
 import { useContextMenu } from "./hooks/useContextMenu"
 import { useCameraPreset } from "./hooks/useCameraPreset"
 import { useGlobalDownloadGltf } from "./hooks/useGlobalDownloadGltf"
@@ -28,7 +27,6 @@ import { KeyboardShortcutsDialog } from "./components/KeyboardShortcutsDialog"
 import type { CameraController, CameraPreset } from "./hooks/cameraAnimation"
 
 const CadViewerInner = (props: any) => {
-  const [engine, setEngine] = useState<"jscad" | "manifold">("manifold")
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [isKeyboardShortcutsDialogOpen, setIsKeyboardShortcutsDialogOpen] =
     useState(false)
@@ -188,17 +186,6 @@ const CadViewerInner = (props: any) => {
   }, [])
 
   useEffect(() => {
-    const stored = window.localStorage.getItem("cadViewerEngine")
-    if (stored === "jscad" || stored === "manifold") {
-      setEngine(stored)
-    }
-  }, [])
-
-  useEffect(() => {
-    window.localStorage.setItem("cadViewerEngine", engine)
-  }, [engine])
-
-  useEffect(() => {
     window.localStorage.setItem("cadViewerAutoRotate", String(autoRotate))
   }, [autoRotate])
 
@@ -241,50 +228,19 @@ const CadViewerInner = (props: any) => {
       }}
       {...contextMenuEventHandlers}
     >
-      {engine === "jscad" ? (
-        <CadViewerJscad
-          {...props}
-          autoRotateDisabled={props.autoRotateDisabled || !autoRotate}
-          cameraType={cameraType}
-          onUserInteraction={handleUserInteraction}
-          onCameraControllerReady={handleCameraControllerReady}
-        />
-      ) : (
-        <CadViewerManifold
-          {...props}
-          autoRotateDisabled={props.autoRotateDisabled || !autoRotate}
-          cameraType={cameraType}
-          onUserInteraction={handleUserInteraction}
-          onCameraControllerReady={handleCameraControllerReady}
-        />
-      )}
-      <div
-        style={{
-          position: "absolute",
-          right: 8,
-          top: 8,
-          background: "#222",
-          color: "#fff",
-          padding: "2px 8px",
-          borderRadius: 4,
-          fontSize: 12,
-          opacity: 0.7,
-          userSelect: "none",
-        }}
-      >
-        Engine: <b>{engine === "jscad" ? "JSCAD" : "Manifold"}</b>
-      </div>
+      <CadViewerJscad
+        {...props}
+        autoRotateDisabled={props.autoRotateDisabled || !autoRotate}
+        cameraType={cameraType}
+        onUserInteraction={handleUserInteraction}
+        onCameraControllerReady={handleCameraControllerReady}
+      />
       {menuVisible && (
         <ContextMenu
           menuRef={menuRef}
           menuPos={menuPos}
-          engine={engine}
           cameraPreset={cameraPreset}
           autoRotate={autoRotate}
-          onEngineSwitch={(newEngine) => {
-            setEngine(newEngine)
-            closeMenu()
-          }}
           onCameraPresetSelect={handleCameraPresetSelect}
           onAutoRotateToggle={() => {
             toggleAutoRotate()

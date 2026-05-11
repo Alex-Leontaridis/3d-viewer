@@ -14,7 +14,8 @@ import type { CameraController } from "./hooks/cameraAnimation"
 import { OrientationCubeCanvas } from "./three-components/OrientationCubeCanvas"
 import { zIndexMap } from "../lib/utils/z-index-map"
 
-const CANVAS_BACKGROUND = "#2c3140"
+// Match src-new/EmptyThreeView (scene.background 0x2a2a2e)
+const CANVAS_BACKGROUND = "#2a2a2e"
 
 export type {
   CameraController,
@@ -130,8 +131,8 @@ export const CadViewerContainer = forwardRef<
             infiniteGrid={true}
             cellSize={0.5}
             sectionSize={5}
-            gridColor={0x6a5d78}
-            sectionColor={0x6d84f0}
+            gridColor={0x4a4a52}
+            sectionColor={0x6b6b73}
             fadeDistance={320}
             fadeStrength={1.5}
             args={[gridSectionSize, gridSectionSize]}

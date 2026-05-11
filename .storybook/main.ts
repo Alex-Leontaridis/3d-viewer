@@ -56,9 +56,6 @@ const config: StorybookConfig = {
         },
         logLevel: "info",
       },
-      optimizeDeps: {
-        exclude: ["manifold-3d"],
-      },
     }
     return mergeConfig(config, customViteConfig)
   },

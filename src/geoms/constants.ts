@@ -50,10 +50,8 @@ export const colors = {
   fr1SolderMaskGreen: [0.08, 0.38, 0.1],
 } satisfies Record<string, RGB>
 
-// Constants for Manifold processing
-export const MANIFOLD_Z_OFFSET = 0.001 // Small offset to prevent Z-fighting
-export const SMOOTH_CIRCLE_SEGMENTS = 32 // Number of segments for smooth circles
-export const DEFAULT_SMT_PAD_THICKNESS = 0.035 // Typical 1oz copper thickness in mm
+/** Circle segment count for smooth cylindrical / rounded geometry (JSCAD) */
+export const SMOOTH_CIRCLE_SEGMENTS = 32
 export const TRACE_TEXTURE_RESOLUTION = 150 // pixels per mm for trace texture
 
 export const FAUX_BOARD_OPACITY = 0.6 // Opacity for faux boards (60% transparent)

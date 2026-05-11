@@ -74,7 +74,7 @@ importers:
         version: 0.0.29(@gltf-transform/core@4.3.0)(@gltf-transform/extensions@4.3.0)(@gltf-transform/functions@4.3.0)(esbuild-wasm@0.27.7)(typescript@5.9.3)
       '@tscircuit/eval':
         specifier: ^0.0.836
-        version: 0.0.836(@tscircuit/core@0.0.1209(0cc0490f6ab81b4bb8f0c2be31b54dc7))(circuit-json@0.0.421)(typescript@5.9.3)(zod@3.25.76)
+        version: 0.0.836(@tscircuit/core@0.0.1209(104e459573c15d62ffaa3ae6cabed470))(circuit-json@0.0.421)(typescript@5.9.3)(zod@3.25.76)
       '@tscircuit/krt-wasm':
         specifier: ^0.1.0
         version: 0.1.0(tscircuit@0.0.1704(@gltf-transform/core@4.3.0)(@gltf-transform/extensions@4.3.0)(@gltf-transform/functions@4.3.0)(@tscircuit/schematic-corpus@0.0.114(typescript@5.9.3))(bun-match-svg@0.0.9(typescript@5.9.3))(esbuild-wasm@0.27.7)(looks-same@9.0.1)(three@0.165.0)(typescript@5.9.3))
@@ -126,9 +126,6 @@ importers:
       jsdom:
         specifier: ^26.0.0
         version: 26.1.0
-      manifold-3d:
-        specifier: ^3.2.1
-        version: 3.4.1(@gltf-transform/core@4.3.0)(@gltf-transform/extensions@4.3.0)(@gltf-transform/functions@4.3.0)(esbuild-wasm@0.27.7)
       react-use-gesture:
         specifier: ^9.1.3
         version: 9.1.3(react@19.1.0)
@@ -4647,6 +4644,37 @@ snapshots:
       - '@gltf-transform/functions'
       - esbuild-wasm
 
+  '@tscircuit/core@0.0.1209(0cc0490f6ab81b4bb8f0c2be31b54dc7)':
+    dependencies:
+      '@flatten-js/core': 1.6.12
+      '@lume/kiwi': 0.4.4
+      '@tscircuit/capacity-autorouter': 0.0.480(typescript@5.9.3)
+      '@tscircuit/checks': 0.0.125(@flatten-js/core@1.6.12)(@tscircuit/math-utils@0.0.36(typescript@5.9.3))(circuit-json-to-connectivity-map@0.0.23(typescript@5.9.3))(circuit-json@0.0.421)(typescript@5.9.3)
+      '@tscircuit/circuit-json-util': 0.0.94(circuit-json@0.0.421)(transformation-matrix@2.16.1)(zod@3.25.76)
+      '@tscircuit/footprinter': 0.0.351(circuit-json@0.0.421)(typescript@5.9.3)
+      '@tscircuit/infgrid-ijump-astar': 0.0.35
+      '@tscircuit/matchpack': 0.0.16(typescript@5.9.3)
+      '@tscircuit/math-utils': 0.0.36(typescript@5.9.3)
+      '@tscircuit/props': 0.0.513(circuit-json@0.0.421)(react@19.1.0)(zod@3.25.76)
+      '@tscircuit/schematic-match-adapt': 0.0.16(typescript@5.9.3)
+      bpc-graph: 0.0.57(@tscircuit/schematic-corpus@0.0.114(typescript@5.9.3))(typescript@5.9.3)
+      calculate-packing: 0.0.71(@tscircuit/circuit-json-util@0.0.94(circuit-json@0.0.421)(transformation-matrix@2.16.1)(zod@3.25.76))(typescript@5.9.3)
+      circuit-json: 0.0.421
+      circuit-json-to-bpc: 0.0.13(bpc-graph@0.0.57(@tscircuit/schematic-corpus@0.0.114(typescript@5.9.3))(typescript@5.9.3))(circuit-json@0.0.421)(typescript@5.9.3)
+      circuit-json-to-connectivity-map: 0.0.23(typescript@5.9.3)
+      css-select: 5.1.0
+      format-si-unit: 0.0.3(typescript@5.9.3)
+      nanoid: 5.1.11
+      performance-now: 2.1.0
+      react-reconciler: 0.32.0(react@19.1.0)
+      schematic-symbols: 0.0.208(typescript@5.9.3)
+      svg-path-commander: 2.2.1
+      transformation-matrix: 2.16.1
+      typescript: 5.9.3
+      zod: 3.25.76
+    transitivePeerDependencies:
+      - react
+
   '@tscircuit/core@0.0.1209(104e459573c15d62ffaa3ae6cabed470)':
     dependencies:
       '@flatten-js/core': 1.6.12
@@ -4678,14 +4706,14 @@ snapshots:
     transitivePeerDependencies:
       - react
 
-  '@tscircuit/eval@0.0.803(@tscircuit/core@0.0.1209(0cc0490f6ab81b4bb8f0c2be31b54dc7))(circuit-json@0.0.421)(typescript@5.9.3)(zod@3.25.76)':
+  '@tscircuit/eval@0.0.803(@tscircuit/core@0.0.1209(104e459573c15d62ffaa3ae6cabed470))(circuit-json@0.0.421)(typescript@5.9.3)(zod@3.25.76)':
     dependencies:
       '@tscircuit/core': 0.0.1209(104e459573c15d62ffaa3ae6cabed470)
       circuit-json: 0.0.421
       typescript: 5.9.3
       zod: 3.25.76
 
-  '@tscircuit/eval@0.0.836(@tscircuit/core@0.0.1209(0cc0490f6ab81b4bb8f0c2be31b54dc7))(circuit-json@0.0.421)(typescript@5.9.3)(zod@3.25.76)':
+  '@tscircuit/eval@0.0.836(@tscircuit/core@0.0.1209(104e459573c15d62ffaa3ae6cabed470))(circuit-json@0.0.421)(typescript@5.9.3)(zod@3.25.76)':
     dependencies:
       '@tscircuit/core': 0.0.1209(104e459573c15d62ffaa3ae6cabed470)
       circuit-json: 0.0.421
@@ -4756,9 +4784,9 @@ snapshots:
       react: 19.1.0
       zod: 3.25.76
 
-  '@tscircuit/runframe@0.0.1900(@tscircuit/core@0.0.1209(0cc0490f6ab81b4bb8f0c2be31b54dc7))(circuit-json@0.0.421)(typescript@5.9.3)(zod@3.25.76)':
+  '@tscircuit/runframe@0.0.1900(@tscircuit/core@0.0.1209(104e459573c15d62ffaa3ae6cabed470))(circuit-json@0.0.421)(typescript@5.9.3)(zod@3.25.76)':
     dependencies:
-      '@tscircuit/eval': 0.0.803(@tscircuit/core@0.0.1209(0cc0490f6ab81b4bb8f0c2be31b54dc7))(circuit-json@0.0.421)(typescript@5.9.3)(zod@3.25.76)
+      '@tscircuit/eval': 0.0.803(@tscircuit/core@0.0.1209(104e459573c15d62ffaa3ae6cabed470))(circuit-json@0.0.421)(typescript@5.9.3)(zod@3.25.76)
       '@tscircuit/solver-utils': 0.0.7(typescript@5.9.3)
     transitivePeerDependencies:
       - '@tscircuit/core'
@@ -6498,8 +6526,8 @@ snapshots:
       '@tscircuit/circuit-json-util': 0.0.94(circuit-json@0.0.421)(transformation-matrix@2.16.1)(zod@3.25.76)
       '@tscircuit/cli': 0.1.1360(tscircuit@0.0.1704(@gltf-transform/core@4.3.0)(@gltf-transform/extensions@4.3.0)(@gltf-transform/functions@4.3.0)(@tscircuit/schematic-corpus@0.0.114(typescript@5.9.3))(bun-match-svg@0.0.9(typescript@5.9.3))(esbuild-wasm@0.27.7)(looks-same@9.0.1)(three@0.165.0)(typescript@5.9.3))
       '@tscircuit/copper-pour-solver': 0.0.29(@gltf-transform/core@4.3.0)(@gltf-transform/extensions@4.3.0)(@gltf-transform/functions@4.3.0)(esbuild-wasm@0.27.7)(typescript@5.9.3)
-      '@tscircuit/core': 0.0.1209(104e459573c15d62ffaa3ae6cabed470)
-      '@tscircuit/eval': 0.0.803(@tscircuit/core@0.0.1209(0cc0490f6ab81b4bb8f0c2be31b54dc7))(circuit-json@0.0.421)(typescript@5.9.3)(zod@3.25.76)
+      '@tscircuit/core': 0.0.1209(0cc0490f6ab81b4bb8f0c2be31b54dc7)
+      '@tscircuit/eval': 0.0.803(@tscircuit/core@0.0.1209(104e459573c15d62ffaa3ae6cabed470))(circuit-json@0.0.421)(typescript@5.9.3)(zod@3.25.76)
       '@tscircuit/footprinter': 0.0.351(circuit-json@0.0.421)(typescript@5.9.3)
       '@tscircuit/infer-cable-insertion-point': 0.0.2(typescript@5.9.3)
       '@tscircuit/infgrid-ijump-astar': 0.0.35
@@ -6509,7 +6537,7 @@ snapshots:
       '@tscircuit/miniflex': 0.0.4(typescript@5.9.3)
       '@tscircuit/ngspice-spice-engine': 0.0.8(@tscircuit/props@0.0.513(circuit-json@0.0.421)(react@19.1.0)(zod@3.25.76))(circuit-json@0.0.421)(typescript@5.9.3)
       '@tscircuit/props': 0.0.513(circuit-json@0.0.421)(react@19.1.0)(zod@3.25.76)
-      '@tscircuit/runframe': 0.0.1900(@tscircuit/core@0.0.1209(0cc0490f6ab81b4bb8f0c2be31b54dc7))(circuit-json@0.0.421)(typescript@5.9.3)(zod@3.25.76)
+      '@tscircuit/runframe': 0.0.1900(@tscircuit/core@0.0.1209(104e459573c15d62ffaa3ae6cabed470))(circuit-json@0.0.421)(typescript@5.9.3)(zod@3.25.76)
       '@tscircuit/schematic-match-adapt': 0.0.16(typescript@5.9.3)
       '@tscircuit/schematic-trace-solver': 0.0.51(typescript@5.9.3)
       '@tscircuit/simple-3d-svg': 0.0.41

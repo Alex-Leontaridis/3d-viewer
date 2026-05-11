@@ -2,7 +2,7 @@
  * Default values for the viewer dev panel. Keep in sync with:
  * - configure-renderer.ts (toneMappingExposure)
  * - Lights.tsx (light intensities, scene.environmentIntensity)
- * - CadViewerContainer (canvas + grid colors)
+ * - CadViewerContainer / EmptyThreeView (canvas + grid colors)
  * - geoms/constants.ts (FR4_SOLDERMASK_HEX)
  * - create-board-texture-material.ts (board BRDF)
  */
@@ -49,7 +49,7 @@ export const VIEWER_DEV_DEFAULT_PARAMS: ViewerDevParams = {
   boardClearcoat: BOARD_CLEARCOAT,
   boardClearcoatRoughness: BOARD_CLEARCOAT_ROUGHNESS,
   boardEnvMapIntensity: BOARD_TEXTURE_ENV_MAP_INTENSITY,
-  canvasBackground: "#2c3140",
-  gridColorHex: 0x6a5d78,
-  gridSectionColorHex: 0x6d84f0,
+  canvasBackground: "#2a2a2e",
+  gridColorHex: 0x4a4a52,
+  gridSectionColorHex: 0x6b6b73,
 }

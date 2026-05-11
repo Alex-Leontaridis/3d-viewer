@@ -11,10 +11,8 @@ import { zIndexMap } from "../../lib/utils/z-index-map"
 interface ContextMenuProps {
   menuRef: React.RefObject<HTMLDivElement | null>
   menuPos: { x: number; y: number }
-  engine: "jscad" | "manifold"
   cameraPreset: CameraPreset
   autoRotate: boolean
-  onEngineSwitch: (engine: "jscad" | "manifold") => void
   onCameraPresetSelect: (preset: CameraPreset) => void
   onAutoRotateToggle: () => void
   onDownloadGltf: () => void
@@ -102,10 +100,8 @@ const badgeStyles: React.CSSProperties = {
 export const ContextMenu: React.FC<ContextMenuProps> = ({
   menuRef,
   menuPos,
-  engine,
   cameraPreset,
   autoRotate,
-  onEngineSwitch,
   onCameraPresetSelect,
   onAutoRotateToggle,
   onDownloadGltf,
@@ -280,39 +276,6 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
               <span style={{ display: "flex", alignItems: "center" }}>
                 Download GLTF
               </span>
-            </DropdownMenu.Item>
-
-            <DropdownMenu.Separator style={separatorStyles} />
-
-            {/* Engine Switch */}
-            <DropdownMenu.Item
-              style={{
-                ...itemStyles,
-                ...itemPaddingStyles,
-                backgroundColor:
-                  hoveredItem === "engine" ? "#404040" : "transparent",
-              }}
-              onSelect={(e) => e.preventDefault()}
-              onPointerDown={(e) => {
-                e.preventDefault()
-                onEngineSwitch(engine === "jscad" ? "manifold" : "jscad")
-              }}
-              onMouseEnter={() => setHoveredItem("engine")}
-              onMouseLeave={() => setHoveredItem(null)}
-              onTouchStart={() => setHoveredItem("engine")}
-            >
-              <span style={{ flex: 1, display: "flex", alignItems: "center" }}>
-                Switch to {engine === "jscad" ? "Manifold" : "JSCAD"} Engine
-              </span>
-              <div
-                style={{
-                  ...badgeStyles,
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                {engine === "jscad" ? "experimental" : "default"}
-              </div>
             </DropdownMenu.Item>
 
             <DropdownMenu.Separator style={separatorStyles} />
