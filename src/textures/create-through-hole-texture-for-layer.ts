@@ -1,6 +1,9 @@
 import type { AnyCircuitElement, PcbBoard } from "circuit-json"
 import * as THREE from "three"
-import { TRACE_TEXTURE_RESOLUTION } from "../geoms/constants"
+import {
+  COPPER_RGB_CSS,
+  TRACE_TEXTURE_RESOLUTION,
+} from "../geoms/constants"
 import { calculateOutlineBounds } from "../utils/outline-bounds"
 import { drawThroughHoleLayer } from "./through-hole/through-hole-drawing"
 
@@ -8,7 +11,7 @@ export function createThroughHoleTextureForLayer({
   layer,
   circuitJson,
   boardData,
-  copperColor = "rgb(230, 153, 51)",
+  copperColor = COPPER_RGB_CSS,
   traceTextureResolution = TRACE_TEXTURE_RESOLUTION,
 }: {
   layer: "top" | "bottom"

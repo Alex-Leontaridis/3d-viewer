@@ -36,7 +36,7 @@ export function createGeometryMeshes(
         const mesh = new THREE.Mesh(
           comp.geometry,
           new THREE.MeshStandardMaterial({
-            color: 0xffd700,
+            color: comp.color,
             side: THREE.DoubleSide,
             metalness: 0.8,
             roughness: 0.3,

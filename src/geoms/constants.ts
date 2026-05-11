@@ -11,6 +11,9 @@ export const BOARD_SURFACE_OFFSET = {
 // FR4 solder mask (hex); `fr4SolderMaskGreen` is the same tint in linear RGB
 export const FR4_SOLDERMASK_HEX = 0x72c48a
 
+// Exposed copper / pads / traces tint (pale gold); drives textures and mesh layers
+export const COPPER_HEX = 0xe0d0b0
+
 const fr4SolderMaskFromHex = (): [number, number, number] => {
   const h = FR4_SOLDERMASK_HEX
   return [
@@ -20,14 +23,27 @@ const fr4SolderMaskFromHex = (): [number, number, number] => {
   ]
 }
 
+const copperRgbFromHex = (): RGB => {
+  const h = COPPER_HEX
+  return [
+    ((h >> 16) & 255) / 255,
+    ((h >> 8) & 255) / 255,
+    (h & 255) / 255,
+  ]
+}
+
+const copperRgb = copperRgbFromHex()
+
+export const COPPER_RGB_CSS = `rgb(${(COPPER_HEX >> 16) & 255}, ${(COPPER_HEX >> 8) & 255}, ${COPPER_HEX & 255})`
+
 export const colors = {
-  copper: [0.9, 0.6, 0.2],
+  copper: copperRgb,
   fr4Tan: [0.6, 0.43, 0.28],
   fr4SolderMaskGreen: fr4SolderMaskFromHex(),
   fr4TracesWithMaskGreen: [0.12, 0.42, 0.08],
   fr4TracesWithoutMaskTan: [0.6, 0.43, 0.28],
   fr1Tan: [0.8, 0.4, 0.2],
-  fr1TracesWithMaskCopper: [0.9, 0.6, 0.2],
+  fr1TracesWithMaskCopper: copperRgb,
   fr1SolderMaskGreen: [0.08, 0.38, 0.1],
 } satisfies Record<string, RGB>
 

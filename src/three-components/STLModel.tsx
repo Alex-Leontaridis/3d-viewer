@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react"
 import * as THREE from "three"
 import { STLLoader } from "three-stdlib"
-import { FR4_SOLDERMASK_HEX } from "src/geoms/constants"
+import { COPPER_HEX, FR4_SOLDERMASK_HEX } from "src/geoms/constants"
 import { useThree } from "src/react-three/ThreeContext"
 import { getDefaultEnvironmentMap } from "src/react-three/getDefaultEnvironmentMap"
 import { applyComponentEnvironment } from "src/utils/apply-component-environment"
@@ -59,7 +59,7 @@ export function STLModel({
     const resolvedColor = isBoardLayer
       ? FR4_SOLDERMASK_HEX
       : isCopperLayer
-        ? 0xffd700
+        ? COPPER_HEX
         : Array.isArray(color)
           ? new THREE.Color(color[0], color[1], color[2])
           : color
