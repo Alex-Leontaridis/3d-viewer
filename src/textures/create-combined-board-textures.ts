@@ -6,8 +6,8 @@ import { calculateOutlineBounds } from "../utils/outline-bounds"
 import { createPadTextureForLayer } from "../utils/pad-texture"
 import { createPanelOutlineTextureForLayer } from "../utils/panel-outline-texture"
 import { createTraceTextureForLayer } from "../utils/trace-texture"
-import { createCopperTextTextureForLayer } from "./create-copper-text-texture-for-layer"
 import { createCopperPourTextureForLayer } from "./create-copper-pour-texture-for-layer"
+import { createCopperTextTextureForLayer } from "./create-copper-text-texture-for-layer"
 import { createFabricationNoteTextureForLayer } from "./create-fabrication-note-texture-for-layer"
 import { createPcbNoteTextureForLayer } from "./create-pcb-note-texture-for-layer"
 import { createSilkscreenTextureForLayer } from "./create-silkscreen-texture-for-layer"
@@ -71,11 +71,15 @@ const createCombinedTexture = ({
   const ctx = canvas.getContext("2d")
   if (!ctx) return null
 
-  textures.forEach((texture) => {
-    if (!texture?.image) return
+  for (const texture of textures) {
+    if (!texture?.image) continue
     const image = texture.image as HTMLCanvasElement
-    ctx.drawImage(image, 0, 0, canvasWidth, canvasHeight)
-  })
+    if (image.width === canvasWidth && image.height === canvasHeight) {
+      ctx.drawImage(image, 0, 0)
+    } else {
+      ctx.drawImage(image, 0, 0, canvasWidth, canvasHeight)
+    }
+  }
 
   const combinedTexture = new THREE.CanvasTexture(canvas)
   combinedTexture.colorSpace = THREE.SRGBColorSpace
@@ -180,8 +184,8 @@ const createBumpMapFromCopperLayers = ({
   const tmp = new Float32Array(n)
   const work = new Float32Array(n)
   work.set(alpha)
-  let blurA = work
-  let blurB = tmp
+  const blurA = work
+  const blurB = tmp
   for (let pass = 0; pass < BUMP_ALPHA_BLUR_RADIUS; pass++) {
     boxBlurAlpha1D(blurA, blurB, w, h, true, 1)
     boxBlurAlpha1D(blurB, blurA, w, h, false, 1)

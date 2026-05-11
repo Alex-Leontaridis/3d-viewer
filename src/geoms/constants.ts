@@ -26,20 +26,12 @@ export const COPPER_HEX = 0xe0d0b0
 
 const fr4SolderMaskFromHex = (): [number, number, number] => {
   const h = FR4_SOLDERMASK_HEX
-  return [
-    ((h >> 16) & 255) / 255,
-    ((h >> 8) & 255) / 255,
-    (h & 255) / 255,
-  ]
+  return [((h >> 16) & 255) / 255, ((h >> 8) & 255) / 255, (h & 255) / 255]
 }
 
 const copperRgbFromHex = (): RGB => {
   const h = COPPER_HEX
-  return [
-    ((h >> 16) & 255) / 255,
-    ((h >> 8) & 255) / 255,
-    (h & 255) / 255,
-  ]
+  return [((h >> 16) & 255) / 255, ((h >> 8) & 255) / 255, (h & 255) / 255]
 }
 
 const copperRgb = copperRgbFromHex()
@@ -76,7 +68,7 @@ export const colors = {
 
 /** Circle segment count for smooth cylindrical / rounded geometry (JSCAD) */
 export const SMOOTH_CIRCLE_SEGMENTS = 32
-export const TRACE_TEXTURE_RESOLUTION = 150 // pixels per mm for trace texture
+export const TRACE_TEXTURE_RESOLUTION = 240 // pixels per mm (capped in getLayerTextureResolution)
 
 export const FAUX_BOARD_OPACITY = 0.6 // Opacity for faux boards (60% transparent)
 export const boardMaterialColors: Record<PcbBoard["material"], RGB> = {

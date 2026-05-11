@@ -4,9 +4,12 @@ import { useEffect, useMemo } from "react"
 import { createCombinedBoardTextures } from "src/textures"
 import * as THREE from "three"
 import { useLayerVisibility } from "../contexts/LayerVisibilityContext"
-import { TRACE_TEXTURE_RESOLUTION, TEXTURE_PLANE_Z_OFFSET_MM } from "../geoms/constants"
-import { useThree } from "../react-three/ThreeContext"
+import {
+  TEXTURE_PLANE_Z_OFFSET_MM,
+  TRACE_TEXTURE_RESOLUTION,
+} from "../geoms/constants"
 import { getDefaultEnvironmentMap } from "../react-three/getDefaultEnvironmentMap"
+import { useThree } from "../react-three/ThreeContext"
 import {
   applyBoardEnvironmentMap,
   createBoardTextureMaterial,
@@ -62,8 +65,13 @@ export function JscadBoardTextures({
 
   const traceTextureResolution = useMemo(() => {
     if (!boardData) return TRACE_TEXTURE_RESOLUTION
-    return getLayerTextureResolution(boardData, TRACE_TEXTURE_RESOLUTION)
-  }, [boardData])
+    const base = getLayerTextureResolution(boardData, TRACE_TEXTURE_RESOLUTION)
+    const raw =
+      renderer?.getPixelRatio() ??
+      (typeof window !== "undefined" ? window.devicePixelRatio : 1)
+    const scaledDesired = base * Math.min(2, Math.max(1, raw || 1))
+    return getLayerTextureResolution(boardData, scaledDesired)
+  }, [boardData, renderer])
 
   const textures = useMemo(() => {
     if (!boardData || !boardData.width || !boardData.height) return null

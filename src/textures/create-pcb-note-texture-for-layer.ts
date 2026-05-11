@@ -1,8 +1,8 @@
 import type { AnyCircuitElement, PcbBoard } from "circuit-json"
 import * as THREE from "three"
 import { TRACE_TEXTURE_RESOLUTION } from "../geoms/constants"
+import { calculateOutlineBounds } from "../utils/outline-bounds"
 import { drawPcbNoteLayer } from "./pcb-note/pcb-note-drawing"
-import { getSoldermaskRenderBounds } from "./soldermask/soldermask-bounds"
 
 const isPcbNoteElement = (
   element: AnyCircuitElement,
@@ -28,7 +28,7 @@ export function createPcbNoteTextureForLayer({
   )
   if (elements.length === 0) return null
 
-  const bounds = getSoldermaskRenderBounds(circuitJson, boardData)
+  const bounds = calculateOutlineBounds(boardData)
   const canvasWidth = Math.floor(bounds.width * traceTextureResolution)
   const canvasHeight = Math.floor(bounds.height * traceTextureResolution)
   if (canvasWidth <= 0 || canvasHeight <= 0) return null
