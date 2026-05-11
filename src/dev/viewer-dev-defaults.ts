@@ -2,7 +2,7 @@
  * Default values for the viewer dev panel. Keep in sync with:
  * - configure-renderer.ts (toneMappingExposure)
  * - Lights.tsx (light intensities, scene.environmentIntensity)
- * - CadViewerContainer / EmptyThreeView (canvas + grid colors)
+ * - CadViewerContainer (canvas + grid colors)
  * - geoms/constants.ts (FR4_SOLDERMASK_HEX)
  * - create-board-texture-material.ts (board BRDF)
  */

@@ -17,7 +17,7 @@ import { useCameraSession } from "./hooks/useCameraSession"
 import { OrientationCubeCanvas } from "./three-components/OrientationCubeCanvas"
 import { zIndexMap } from "../lib/utils/z-index-map"
 
-// Match src-new/EmptyThreeView (scene.background 0x2a2a2e)
+// Empty viewer canvas background (scene.background 0x2a2a2e)
 const CANVAS_BACKGROUND = "#2a2a2e"
 
 export type {

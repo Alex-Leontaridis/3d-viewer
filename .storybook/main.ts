@@ -29,7 +29,6 @@ const config: StorybookConfig = {
       resolve: {
         alias: {
           src: path.resolve(__dirname, "../src"),
-          "src-new": path.resolve(__dirname, "../src-new"),
         },
       },
       server: {
