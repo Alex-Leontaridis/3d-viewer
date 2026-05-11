@@ -248,10 +248,6 @@ const CadViewerInner = (props: any) => {
             downloadGltf()
             closeMenu()
           }}
-          onOpenKeyboardShortcuts={() => {
-            setIsKeyboardShortcutsDialogOpen(true)
-            closeMenu()
-          }}
         />
       )}
       <KeyboardShortcutsDialog

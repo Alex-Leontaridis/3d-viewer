@@ -1,7 +1,6 @@
 import type * as React from "react"
 import { forwardRef, useEffect, useMemo, useState } from "react"
 import * as THREE from "three"
-import packageJson from "../package.json"
 import { Canvas } from "./react-three/Canvas"
 import { OrbitControls } from "./react-three/OrbitControls"
 import { Grid } from "./react-three/Grid"
@@ -147,19 +146,6 @@ export const CadViewerContainer = forwardRef<
           />
           {children}
         </Canvas>
-        <div
-          style={{
-            position: "absolute",
-            right: 24,
-            bottom: 24,
-            fontFamily: "sans-serif",
-            color: "white",
-            WebkitTextStroke: "0.5px rgba(0, 0, 0, 0.5)",
-            fontSize: 11,
-          }}
-        >
-          @{packageJson.version}
-        </div>
         {clickToInteractEnabled && !isInteractionEnabled && (
           <button
             type="button"

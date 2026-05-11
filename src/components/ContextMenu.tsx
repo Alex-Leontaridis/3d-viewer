@@ -4,7 +4,6 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
 import { AppearanceMenu } from "./AppearanceMenu"
 import type { CameraPreset } from "../hooks/cameraAnimation"
 import { useCameraController } from "../contexts/CameraControllerContext"
-import packageJson from "../../package.json"
 import { CheckIcon, ChevronRightIcon, DotIcon } from "./Icons"
 import { zIndexMap } from "../../lib/utils/z-index-map"
 
@@ -16,7 +15,6 @@ interface ContextMenuProps {
   onCameraPresetSelect: (preset: CameraPreset) => void
   onAutoRotateToggle: () => void
   onDownloadGltf: () => void
-  onOpenKeyboardShortcuts: () => void
 }
 
 const cameraOptions: CameraPreset[] = [
@@ -87,18 +85,6 @@ const separatorStyles: React.CSSProperties = {
   margin: "4px 0",
 }
 
-const badgeStyles: React.CSSProperties = {
-  fontSize: 11,
-  opacity: 0.65,
-  fontWeight: 500,
-  color: "#b5b5bcff",
-  backgroundColor: "rgba(161, 161, 170, 0.1)",
-  padding: "2px 6px",
-  borderRadius: 4,
-  border: "1px solid rgba(161, 161, 170, 0.2)",
-  letterSpacing: "0.3px",
-}
-
 export const ContextMenu: React.FC<ContextMenuProps> = ({
   menuRef,
   menuPos,
@@ -107,7 +93,6 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
   onCameraPresetSelect,
   onAutoRotateToggle,
   onDownloadGltf,
-  onOpenKeyboardShortcuts,
 }) => {
   const { cameraType, setCameraType } = useCameraController()
   const [cameraSubOpen, setCameraSubOpen] = useState(false)
@@ -279,61 +264,6 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
                 Download GLTF
               </span>
             </DropdownMenu.Item>
-
-            <DropdownMenu.Separator style={separatorStyles} />
-
-            {/* Keyboard Shortcuts */}
-            <DropdownMenu.Item
-              style={{
-                ...itemStyles,
-                ...itemPaddingStyles,
-                backgroundColor:
-                  hoveredItem === "shortcuts" ? "#404040" : "transparent",
-              }}
-              onSelect={onOpenKeyboardShortcuts}
-              onMouseEnter={() => setHoveredItem("shortcuts")}
-              onMouseLeave={() => setHoveredItem(null)}
-              onTouchStart={() => setHoveredItem("shortcuts")}
-            >
-              <span style={{ flex: 1, display: "flex", alignItems: "center" }}>
-                Keyboard Shortcuts
-              </span>
-              <div
-                style={{
-                  ...badgeStyles,
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                Shift+?
-              </div>
-            </DropdownMenu.Item>
-
-            <DropdownMenu.Separator style={separatorStyles} />
-
-            {/* Footer */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                marginTop: 0,
-                paddingLeft: 32,
-                paddingTop: 4,
-                paddingBottom: 4,
-              }}
-            >
-              <span
-                style={{
-                  fontSize: 11,
-                  opacity: 0.35,
-                  fontWeight: 400,
-                  color: "#a1a1aa",
-                  letterSpacing: "0.2px",
-                }}
-              >
-                @tscircuit/3d-viewer@{packageJson.version}
-              </span>
-            </div>
           </DropdownMenu.Content>
         </DropdownMenu.Portal>
       </DropdownMenu.Root>
