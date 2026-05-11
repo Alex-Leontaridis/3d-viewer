@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react"
 import * as THREE from "three"
 import { STLLoader } from "three-stdlib"
 import { COPPER_HEX, FR4_SOLDERMASK_HEX } from "src/geoms/constants"
+import { applyFr4BoardFaceVertexColors } from "src/utils/apply-fr4-board-face-vertex-colors"
 import { useThree } from "src/react-three/ThreeContext"
 import { getDefaultEnvironmentMap } from "src/react-three/getDefaultEnvironmentMap"
 import { applyComponentEnvironment } from "src/utils/apply-component-environment"
@@ -51,9 +52,23 @@ export function STLModel({
     }
   }, [stlUrl, stlData])
 
+  const boardGeometry = useMemo(() => {
+    if (!geom || layerType !== "board") return null
+    const cloned = geom.clone()
+    const working =
+      cloned.index !== null ? cloned.toNonIndexed() : cloned
+    if (working !== cloned) {
+      cloned.dispose()
+    }
+    applyFr4BoardFaceVertexColors(working)
+    return working
+  }, [geom, layerType])
+
   const mesh = useMemo(() => {
     if (!geom) return null
     const isBoardLayer = layerType === "board"
+    const geometryForMesh = isBoardLayer ? boardGeometry : geom
+    if (!geometryForMesh) return null
     const isCopperLayer =
       layerType === "top-copper" || layerType === "bottom-copper"
     const resolvedColor = isBoardLayer
@@ -78,7 +93,8 @@ export function STLModel({
         : inferComponentPbrFromColor(resolvedThreeColor)
     const material = isBoardLayer
       ? new THREE.MeshPhysicalMaterial({
-          color: resolvedColor,
+          color: 0xffffff,
+          vertexColors: true,
           transparent: opacity !== 1,
           opacity: opacity,
           metalness: 0.02,
@@ -99,12 +115,12 @@ export function STLModel({
           polygonOffsetFactor: 0,
           polygonOffsetUnits: 0,
         })
-    const createdMesh = new THREE.Mesh(geom, material)
+    const createdMesh = new THREE.Mesh(geometryForMesh, material)
     createdMesh.renderOrder = isBoardLayer ? -1 : 1
     createdMesh.castShadow = !isBoardLayer
     createdMesh.receiveShadow = true
     return createdMesh
-  }, [geom, color, opacity, layerType])
+  }, [geom, boardGeometry, color, opacity, layerType])
 
   useEffect(() => {
     if (!rootObject || !mesh) return

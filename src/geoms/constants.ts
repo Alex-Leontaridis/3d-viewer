@@ -14,6 +14,13 @@ export const TEXTURE_PLANE_Z_OFFSET_MM = 0.01
 // FR4 solder mask (hex): saturated mid green — readable under ACES without mint wash-out
 export const FR4_SOLDERMASK_HEX = 0x478264
 
+const FR4_SUBSTRATE_R = 232
+const FR4_SUBSTRATE_G = 220
+const FR4_SUBSTRATE_B = 200
+
+export const FR4_SUBSTRATE_HEX =
+  (FR4_SUBSTRATE_R << 16) | (FR4_SUBSTRATE_G << 8) | FR4_SUBSTRATE_B
+
 // Exposed copper / pads / traces tint (pale gold); drives textures and mesh layers
 export const COPPER_HEX = 0xe0d0b0
 
@@ -37,14 +44,22 @@ const copperRgbFromHex = (): RGB => {
 
 const copperRgb = copperRgbFromHex()
 
+const fr4SubstrateRgb = (): RGB => [
+  FR4_SUBSTRATE_R / 255,
+  FR4_SUBSTRATE_G / 255,
+  FR4_SUBSTRATE_B / 255,
+]
+
+const fr4Substrate = fr4SubstrateRgb()
+
 export const COPPER_RGB_CSS = `rgb(${(COPPER_HEX >> 16) & 255}, ${(COPPER_HEX >> 8) & 255}, ${COPPER_HEX & 255})`
 
 export const colors = {
   copper: copperRgb,
-  fr4Tan: [0.6, 0.43, 0.28],
+  fr4Tan: fr4Substrate,
   fr4SolderMaskGreen: fr4SolderMaskFromHex(),
   fr4TracesWithMaskGreen: [0.09, 0.32, 0.18],
-  fr4TracesWithoutMaskTan: [0.6, 0.43, 0.28],
+  fr4TracesWithoutMaskTan: fr4Substrate,
   fr1Tan: [0.8, 0.4, 0.2],
   fr1TracesWithMaskCopper: copperRgb,
   fr1SolderMaskGreen: [0.08, 0.38, 0.1],
