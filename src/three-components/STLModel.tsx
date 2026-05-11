@@ -5,6 +5,7 @@ import { FR4_SOLDERMASK_HEX } from "src/geoms/constants"
 import { useThree } from "src/react-three/ThreeContext"
 import { getDefaultEnvironmentMap } from "src/react-three/getDefaultEnvironmentMap"
 import { applyComponentEnvironment } from "src/utils/apply-component-environment"
+import { inferComponentPbrFromColor } from "src/utils/infer-component-pbr-from-color"
 import {
   applyBoardEnvironmentMap,
   BOARD_CLEARCOAT,
@@ -62,6 +63,19 @@ export function STLModel({
         : Array.isArray(color)
           ? new THREE.Color(color[0], color[1], color[2])
           : color
+    const resolvedThreeColor = new THREE.Color()
+    if (resolvedColor instanceof THREE.Color) {
+      resolvedThreeColor.copy(resolvedColor)
+    } else {
+      resolvedThreeColor.set(resolvedColor)
+    }
+    const isSilkscreenLayer =
+      layerType === "top-silkscreen" || layerType === "bottom-silkscreen"
+    const componentPbr = isCopperLayer
+      ? { metalness: 0.8, roughness: 0.3 }
+      : isSilkscreenLayer
+        ? { metalness: 0.03, roughness: 0.58 }
+        : inferComponentPbrFromColor(resolvedThreeColor)
     const material = isBoardLayer
       ? new THREE.MeshPhysicalMaterial({
           color: resolvedColor,
@@ -79,8 +93,8 @@ export function STLModel({
           color: resolvedColor,
           transparent: opacity !== 1,
           opacity: opacity,
-          metalness: isCopperLayer ? 0.8 : 0.0,
-          roughness: isCopperLayer ? 0.3 : 0.8,
+          metalness: componentPbr.metalness,
+          roughness: componentPbr.roughness,
           polygonOffset: false,
           polygonOffsetFactor: 0,
           polygonOffsetUnits: 0,

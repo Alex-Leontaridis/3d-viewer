@@ -1,9 +1,13 @@
 import ContainerWithTooltip from "src/ContainerWithTooltip"
 import { useGlobalObjLoader } from "src/hooks/use-global-obj-loader"
 import type { Euler, Vector3 } from "three"
-import { useMemo } from "react"
+import { useEffect, useMemo } from "react"
 import * as THREE from "three"
 import type { CadModelFitMode, CadModelSize } from "src/utils/cad-model-fit"
+import { useThree } from "src/react-three/ThreeContext"
+import { getDefaultEnvironmentMap } from "src/react-three/getDefaultEnvironmentMap"
+import { applyComponentEnvironment } from "src/utils/apply-component-environment"
+import { meshPhongToMeshStandard } from "src/utils/infer-component-pbr-from-color"
 import { useCadModelTransformGraph } from "./useCadModelTransformGraph"
 
 export function MixedStlModel({
@@ -35,6 +39,7 @@ export function MixedStlModel({
   scale?: number
   isTranslucent?: boolean
 }) {
+  const { renderer } = useThree()
   const obj = useGlobalObjLoader(url)
   const model = useMemo(() => {
     if (obj && !(obj instanceof Error)) {
@@ -71,6 +76,49 @@ export function MixedStlModel({
       }),
     )
   }, [obj, isTranslucent])
+
+  useEffect(() => {
+    if (!model || !renderer) return
+    const envMap = getDefaultEnvironmentMap(renderer)
+    if (!envMap) return
+
+    const restoreMaterialState: Array<() => void> = []
+
+    const upgradeMaterial = (mat: THREE.Material): THREE.Material => {
+      if (mat instanceof THREE.MeshPhongMaterial) {
+        const next = meshPhongToMeshStandard(mat)
+        const restore = applyComponentEnvironment(next, envMap)
+        if (restore) restoreMaterialState.push(restore)
+        return next
+      }
+      if (mat instanceof THREE.MeshStandardMaterial) {
+        const restore = applyComponentEnvironment(mat, envMap)
+        if (restore) restoreMaterialState.push(restore)
+        return mat
+      }
+      return mat
+    }
+
+    model.traverse((child) => {
+      if (!(child instanceof THREE.Mesh) || !child.material) return
+
+      if (Array.isArray(child.material)) {
+        child.material = child.material.map(upgradeMaterial)
+      } else {
+        child.material = upgradeMaterial(child.material)
+      }
+
+      const mats = Array.isArray(child.material)
+        ? child.material
+        : [child.material]
+      for (const m of mats) m.needsUpdate = true
+    })
+
+    return () => {
+      restoreMaterialState.forEach((restore) => restore())
+    }
+  }, [model, renderer])
+
   const { boardTransformGroup } = useCadModelTransformGraph({
     model,
     position: Array.isArray(position)

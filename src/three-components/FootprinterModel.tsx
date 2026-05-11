@@ -21,8 +21,8 @@ const getFootprintMaterial = (
   if (channelSpread < 0.08 && maxChannel < 0.3) {
     return new THREE.MeshStandardMaterial({
       color: 0x3a3a3a,
-      roughness: 0.75,
-      metalness: 0,
+      roughness: 0.48,
+      metalness: 0.82,
       side: THREE.DoubleSide,
       transparent: isTranslucent,
       opacity: isTranslucent ? 0.5 : 1,

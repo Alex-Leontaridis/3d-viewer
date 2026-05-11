@@ -22,7 +22,7 @@ export const Lights: React.FC = () => {
     const previousEnv = scene.environment
     const previousIntensity = scene.environmentIntensity
     scene.environment = pmrem
-    scene.environmentIntensity = 0.04
+    scene.environmentIntensity = 0.38
     return () => {
       scene.environment = previousEnv ?? null
       scene.environmentIntensity = previousIntensity

@@ -1,6 +1,6 @@
 import * as THREE from "three"
 
-export const COMPONENT_ENV_MAP_INTENSITY = 0.18
+export const COMPONENT_ENV_MAP_INTENSITY = 0.52
 
 export function applyComponentEnvironment(
   material: THREE.Material,
