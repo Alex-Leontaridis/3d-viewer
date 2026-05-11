@@ -13,6 +13,9 @@ import { useCameraSession } from "./hooks/useCameraSession"
 import type { CameraController } from "./hooks/cameraAnimation"
 import { OrientationCubeCanvas } from "./three-components/OrientationCubeCanvas"
 import { zIndexMap } from "../lib/utils/z-index-map"
+
+const CANVAS_BACKGROUND = "#1a1a1a"
+
 export type {
   CameraController,
   CameraPreset,
@@ -94,6 +97,7 @@ export const CadViewerContainer = forwardRef<
         <OrientationCubeCanvas />
         <Canvas
           ref={ref}
+          style={{ backgroundColor: CANVAS_BACKGROUND }}
           scene={{ up: new THREE.Vector3(0, 0, 1) }}
           camera={{ up: [0, 0, 1], position: initialCameraPosition }}
           onCreated={({ camera }) => {
@@ -124,8 +128,12 @@ export const CadViewerContainer = forwardRef<
           <Grid
             rotation={[Math.PI / 2, 0, 0]}
             infiniteGrid={true}
-            cellSize={3}
-            sectionSize={gridSectionSize}
+            cellSize={0.5}
+            sectionSize={5}
+            gridColor={0x4d3749}
+            sectionColor={0x4d57d6}
+            fadeDistance={220}
+            fadeStrength={1.2}
             args={[gridSectionSize, gridSectionSize]}
           />
           {children}

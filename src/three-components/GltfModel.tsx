@@ -4,10 +4,9 @@ import { GLTFLoader } from "three-stdlib"
 import { useThree } from "src/react-three/ThreeContext"
 import ContainerWithTooltip from "src/ContainerWithTooltip"
 import { getDefaultEnvironmentMap } from "src/react-three/getDefaultEnvironmentMap"
+import { applyComponentEnvironment } from "src/utils/apply-component-environment"
 import type { CadModelFitMode, CadModelSize } from "src/utils/cad-model-fit"
 import { useCadModelTransformGraph } from "./useCadModelTransformGraph"
-
-const DEFAULT_ENV_MAP_INTENSITY = 1.25
 
 export function GltfModel({
   gltfUrl,
@@ -65,6 +64,9 @@ export function GltfModel({
 
         scene.traverse((child) => {
           if (child instanceof THREE.Mesh && child.material) {
+            child.castShadow = true
+            child.receiveShadow = true
+
             const setMaterialTransparency = (mat: THREE.Material) => {
               mat.transparent = isTranslucent
               mat.opacity = isTranslucent ? 0.5 : 1
@@ -106,31 +108,11 @@ export function GltfModel({
     const environmentMap = getDefaultEnvironmentMap(renderer)
     if (!environmentMap) return
 
-    const previousMaterialState: Array<{
-      material: THREE.MeshStandardMaterial
-      envMap: THREE.Texture | null
-      envMapIntensity: number
-    }> = []
+    const restoreMaterialState: Array<() => void> = []
 
     const applyEnvironmentToMaterial = (material: THREE.Material) => {
-      if (!(material instanceof THREE.MeshStandardMaterial)) return
-
-      previousMaterialState.push({
-        material,
-        envMap: material.envMap ?? null,
-        envMapIntensity: material.envMapIntensity ?? 1,
-      })
-
-      material.envMap = environmentMap
-
-      if (
-        typeof material.envMapIntensity !== "number" ||
-        material.envMapIntensity < DEFAULT_ENV_MAP_INTENSITY
-      ) {
-        material.envMapIntensity = DEFAULT_ENV_MAP_INTENSITY
-      }
-
-      material.needsUpdate = true
+      const restore = applyComponentEnvironment(material, environmentMap)
+      if (restore) restoreMaterialState.push(restore)
     }
 
     model.traverse((child) => {
@@ -145,11 +127,7 @@ export function GltfModel({
     })
 
     return () => {
-      previousMaterialState.forEach(({ material, envMap, envMapIntensity }) => {
-        material.envMap = envMap
-        material.envMapIntensity = envMapIntensity
-        material.needsUpdate = true
-      })
+      restoreMaterialState.forEach((restore) => restore())
     }
   }, [model, renderer])
 

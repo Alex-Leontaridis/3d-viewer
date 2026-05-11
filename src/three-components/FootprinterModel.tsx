@@ -7,6 +7,51 @@ import * as jscadModeling from "@jscad/modeling"
 import * as THREE from "three"
 import { useThree } from "src/react-three/ThreeContext"
 import ContainerWithTooltip from "src/ContainerWithTooltip"
+import { getDefaultEnvironmentMap } from "src/react-three/getDefaultEnvironmentMap"
+import { applyComponentEnvironment } from "src/utils/apply-component-environment"
+
+const getFootprintMaterial = (
+  color: THREE.Color,
+  isTranslucent: boolean,
+): THREE.MeshStandardMaterial => {
+  const channelSpread =
+    Math.max(color.r, color.g, color.b) - Math.min(color.r, color.g, color.b)
+  const maxChannel = Math.max(color.r, color.g, color.b)
+
+  if (channelSpread < 0.08 && maxChannel < 0.3) {
+    return new THREE.MeshStandardMaterial({
+      color: 0x3a3a3a,
+      roughness: 0.75,
+      metalness: 0,
+      side: THREE.DoubleSide,
+      transparent: isTranslucent,
+      opacity: isTranslucent ? 0.5 : 1,
+      depthWrite: !isTranslucent,
+    })
+  }
+
+  if (channelSpread < 0.12 && maxChannel > 0.55) {
+    return new THREE.MeshStandardMaterial({
+      color: 0xaaaaaa,
+      roughness: 0.3,
+      metalness: 0.9,
+      side: THREE.DoubleSide,
+      transparent: isTranslucent,
+      opacity: isTranslucent ? 0.5 : 1,
+      depthWrite: !isTranslucent,
+    })
+  }
+
+  return new THREE.MeshStandardMaterial({
+    color,
+    roughness: 0.6,
+    metalness: 0.1,
+    side: THREE.DoubleSide,
+    transparent: isTranslucent,
+    opacity: isTranslucent ? 0.5 : 1,
+    depthWrite: !isTranslucent,
+  })
+}
 
 export const FootprinterModel = ({
   positionOffset,
@@ -27,7 +72,7 @@ export const FootprinterModel = ({
   scale?: number
   isTranslucent?: boolean
 }) => {
-  const { rootObject } = useThree()
+  const { rootObject, renderer } = useThree()
   const group = useMemo(() => {
     if (!footprint) return null
     const { geometries } = getJscadModelForFootprint(footprint, jscadModeling)
@@ -41,18 +86,12 @@ export const FootprinterModel = ({
       }
       const color = new THREE.Color(geomInfo.color)
       color.convertLinearToSRGB()
-      const geomWithColor = { ...geom, color: [color.r, color.g, color.b] }
-
-      const threeGeom = convertCSGToThreeGeom(geomWithColor)
-      const material = new THREE.MeshStandardMaterial({
-        vertexColors: true,
-        side: THREE.DoubleSide,
-        transparent: isTranslucent,
-        opacity: isTranslucent ? 0.5 : 1,
-        depthWrite: !isTranslucent,
-      })
+      const threeGeom = convertCSGToThreeGeom(geom)
+      const material = getFootprintMaterial(color, isTranslucent)
       const mesh = new THREE.Mesh(threeGeom, material)
       mesh.renderOrder = isTranslucent ? 2 : 1
+      mesh.castShadow = true
+      mesh.receiveShadow = true
       group.add(mesh)
     }
 
@@ -100,6 +139,32 @@ export const FootprinterModel = ({
     })
   }, [isHovered, group])
 
+  useEffect(() => {
+    if (!group || !renderer) return
+    const envMap = getDefaultEnvironmentMap(renderer)
+    if (!envMap) return
+
+    const restoreMaterialState: Array<() => void> = []
+    group.traverse((child) => {
+      if (!(child instanceof THREE.Mesh)) return
+      const material = child.material
+      if (Array.isArray(material)) {
+        material.forEach((mat) => {
+          const restore = applyComponentEnvironment(mat, envMap)
+          if (restore) restoreMaterialState.push(restore)
+        })
+        return
+      }
+
+      const restore = applyComponentEnvironment(material, envMap)
+      if (restore) restoreMaterialState.push(restore)
+    })
+
+    return () => {
+      restoreMaterialState.forEach((restore) => restore())
+    }
+  }, [group, renderer])
+
   if (!group) return null
 
   return (
@@ -108,8 +173,6 @@ export const FootprinterModel = ({
       onHover={onHover}
       onUnhover={onUnhover}
       object={group}
-    >
-      {/* group is now added imperatively */}
-    </ContainerWithTooltip>
+    />
   )
 }

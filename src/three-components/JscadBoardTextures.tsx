@@ -4,11 +4,13 @@ import { useEffect, useMemo } from "react"
 import { createCombinedBoardTextures } from "src/textures"
 import * as THREE from "three"
 import { useLayerVisibility } from "../contexts/LayerVisibilityContext"
-import {
-  FAUX_BOARD_OPACITY,
-  TRACE_TEXTURE_RESOLUTION,
-} from "../geoms/constants"
+import { TRACE_TEXTURE_RESOLUTION } from "../geoms/constants"
 import { useThree } from "../react-three/ThreeContext"
+import { getDefaultEnvironmentMap } from "../react-three/getDefaultEnvironmentMap"
+import {
+  applyBoardEnvironmentMap,
+  createBoardTextureMaterial,
+} from "../utils/create-board-texture-material"
 import { getLayerTextureResolution } from "../utils/layer-texture-resolution"
 import { calculateOutlineBounds } from "../utils/outline-bounds"
 
@@ -23,7 +25,7 @@ export function JscadBoardTextures({
   pcbThickness,
   isFaux = false,
 }: JscadBoardTexturesProps) {
-  const { rootObject } = useThree()
+  const { rootObject, renderer } = useThree()
   const { visibility } = useLayerVisibility()
 
   const boardData = useMemo(() => {
@@ -122,17 +124,12 @@ export function JscadBoardTextures({
         boardOutlineBounds.width,
         boardOutlineBounds.height,
       )
-      const material = new THREE.MeshBasicMaterial({
+      const material = createBoardTextureMaterial({
         map: texture,
-        transparent: true,
-        alphaTest: 0.08,
-        side: THREE.FrontSide,
-        depthWrite,
+        isFaux,
         polygonOffset: usePolygonOffset,
-        polygonOffsetFactor: usePolygonOffset ? -4 : 0,
-        polygonOffsetUnits: usePolygonOffset ? -4 : 0,
-        opacity: isFaux ? FAUX_BOARD_OPACITY : 1.0,
       })
+      material.depthWrite = depthWrite
       const mesh = new THREE.Mesh(planeGeom, material)
       mesh.position.set(
         boardOutlineBounds.centerX,
@@ -145,6 +142,8 @@ export function JscadBoardTextures({
       mesh.name = name
       mesh.renderOrder = renderOrder
       mesh.frustumCulled = false
+      mesh.castShadow = false
+      mesh.receiveShadow = true
       return mesh
     }
 
@@ -175,7 +174,37 @@ export function JscadBoardTextures({
       rootObject.add(bottomBoardMesh)
     }
 
+    const envMap = renderer ? getDefaultEnvironmentMap(renderer) : null
+    const envPrevious: Array<{
+      material: THREE.MeshStandardMaterial
+      envMap: THREE.Texture | null
+      envMapIntensity: number
+    }> = []
+
+    if (envMap) {
+      for (const mesh of meshes) {
+        const mats = Array.isArray(mesh.material)
+          ? mesh.material
+          : [mesh.material]
+        for (const mat of mats) {
+          if (!(mat instanceof THREE.MeshStandardMaterial)) continue
+          envPrevious.push({
+            material: mat,
+            envMap: mat.envMap ?? null,
+            envMapIntensity: mat.envMapIntensity,
+          })
+          applyBoardEnvironmentMap(mat, envMap)
+        }
+      }
+    }
+
     return () => {
+      for (const { material, envMap: prev, envMapIntensity } of envPrevious) {
+        material.envMap = prev
+        material.envMapIntensity = envMapIntensity
+        material.needsUpdate = true
+      }
+
       meshes.forEach((mesh) => {
         if (mesh.parent === rootObject) {
           rootObject.remove(mesh)
@@ -191,7 +220,7 @@ export function JscadBoardTextures({
       textures.topBoard?.dispose()
       textures.bottomBoard?.dispose()
     }
-  }, [rootObject, boardData, textures, pcbThickness])
+  }, [rootObject, boardData, textures, pcbThickness, renderer, isFaux])
 
   return null
 }

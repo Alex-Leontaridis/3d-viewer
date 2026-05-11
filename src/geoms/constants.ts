@@ -8,15 +8,27 @@ export const BOARD_SURFACE_OFFSET = {
   copper: 0.002,
 } as const
 
+// FR4 solder mask (hex); `fr4SolderMaskGreen` is the same tint in linear RGB
+export const FR4_SOLDERMASK_HEX = 0x72c48a
+
+const fr4SolderMaskFromHex = (): [number, number, number] => {
+  const h = FR4_SOLDERMASK_HEX
+  return [
+    ((h >> 16) & 255) / 255,
+    ((h >> 8) & 255) / 255,
+    (h & 255) / 255,
+  ]
+}
+
 export const colors = {
   copper: [0.9, 0.6, 0.2],
   fr4Tan: [0.6, 0.43, 0.28],
-  fr4SolderMaskGreen: [0.015, 0.059, 0.027],
-  fr4TracesWithMaskGreen: [0.063, 0.141, 0.023],
+  fr4SolderMaskGreen: fr4SolderMaskFromHex(),
+  fr4TracesWithMaskGreen: [0.12, 0.42, 0.08],
   fr4TracesWithoutMaskTan: [0.6, 0.43, 0.28],
   fr1Tan: [0.8, 0.4, 0.2],
   fr1TracesWithMaskCopper: [0.9, 0.6, 0.2],
-  fr1SolderMaskGreen: [0.02, 0.1, 0.04],
+  fr1SolderMaskGreen: [0.08, 0.38, 0.1],
 } satisfies Record<string, RGB>
 
 // Constants for Manifold processing
@@ -37,7 +49,7 @@ export const tracesMaterialColors: Record<PcbBoard["material"], RGB> = {
   fr4: colors.fr4TracesWithoutMaskTan,
 }
 
-// Color for the soldermask layer itself (dark green coating)
+// Soldermask layer tint by board material
 export const soldermaskColors: Record<PcbBoard["material"], RGB> = {
   fr1: colors.fr1SolderMaskGreen,
   fr4: colors.fr4SolderMaskGreen,

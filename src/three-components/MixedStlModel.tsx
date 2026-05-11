@@ -40,6 +40,9 @@ export function MixedStlModel({
     if (obj && !(obj instanceof Error)) {
       obj.traverse((child) => {
         if (child instanceof THREE.Mesh && child.material) {
+          child.castShadow = true
+          child.receiveShadow = true
+
           const setMaterialTransparency = (mat: THREE.Material) => {
             mat.transparent = isTranslucent
             mat.opacity = isTranslucent ? 0.5 : 1

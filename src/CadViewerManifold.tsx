@@ -14,6 +14,8 @@ import { useThree } from "./react-three/ThreeContext"
 import { createTextureMeshes } from "./textures"
 import { Error3d } from "./three-components/Error3d"
 import { ThreeErrorBoundary } from "./three-components/ThreeErrorBoundary"
+import { getDefaultEnvironmentMap } from "./react-three/getDefaultEnvironmentMap"
+import { applyBoardEnvironmentMap } from "./utils/create-board-texture-material"
 import { createGeometryMeshes } from "./utils/manifold/create-three-geometry-meshes"
 import { addFauxBoardIfNeeded } from "./utils/preprocess-circuit-json"
 
@@ -32,7 +34,7 @@ const BoardMeshes = ({
   geometryMeshes: THREE.Mesh[]
   textureMeshes: THREE.Mesh[]
 }) => {
-  const { rootObject } = useThree()
+  const { rootObject, renderer } = useThree()
   const { visibility } = useLayerVisibility()
 
   const disposeMesh = (mesh: THREE.Mesh) => {
@@ -100,6 +102,47 @@ const BoardMeshes = ({
       })
     }
   }, [rootObject, geometryMeshes, visibility])
+
+  useEffect(() => {
+    if (!renderer) return
+    const envMap = getDefaultEnvironmentMap(renderer)
+    if (!envMap) return
+
+    const targets: THREE.Mesh[] = []
+    for (const mesh of geometryMeshes) {
+      if (mesh.name === "board-geom") targets.push(mesh)
+    }
+    targets.push(...textureMeshes)
+
+    const previous: Array<{
+      material: THREE.MeshStandardMaterial
+      envMap: THREE.Texture | null
+      envMapIntensity: number
+    }> = []
+
+    for (const mesh of targets) {
+      const materials = Array.isArray(mesh.material)
+        ? mesh.material
+        : [mesh.material]
+      for (const mat of materials) {
+        if (!(mat instanceof THREE.MeshStandardMaterial)) continue
+        previous.push({
+          material: mat,
+          envMap: mat.envMap ?? null,
+          envMapIntensity: mat.envMapIntensity,
+        })
+        applyBoardEnvironmentMap(mat, envMap)
+      }
+    }
+
+    return () => {
+      for (const { material, envMap: prev, envMapIntensity } of previous) {
+        material.envMap = prev
+        material.envMapIntensity = envMapIntensity
+        material.needsUpdate = true
+      }
+    }
+  }, [renderer, geometryMeshes, textureMeshes])
 
   useEffect(() => {
     if (!rootObject) return

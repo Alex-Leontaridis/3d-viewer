@@ -19,6 +19,8 @@ export function createGeometryMeshes(
       }),
     )
     mesh.name = "board-geom"
+    mesh.castShadow = true
+    mesh.receiveShadow = true
     meshes.push(mesh)
   }
 
@@ -34,12 +36,15 @@ export function createGeometryMeshes(
         const mesh = new THREE.Mesh(
           comp.geometry,
           new THREE.MeshStandardMaterial({
-            color: comp.color,
+            color: 0xffd700,
             side: THREE.DoubleSide,
-            flatShading: true, // Consistent with board
+            metalness: 0.8,
+            roughness: 0.3,
           }),
         )
         mesh.name = comp.key // Use provided key for identification
+        mesh.castShadow = true
+        mesh.receiveShadow = true
         meshes.push(mesh)
       })
     }

@@ -60,6 +60,7 @@ const createCombinedTexture = ({
   })
 
   const combinedTexture = new THREE.CanvasTexture(canvas)
+  combinedTexture.colorSpace = THREE.SRGBColorSpace
   combinedTexture.generateMipmaps = false
   combinedTexture.minFilter = THREE.LinearFilter
   combinedTexture.magFilter = THREE.LinearFilter

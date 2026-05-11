@@ -45,6 +45,10 @@ interface GridProps {
   infiniteGrid?: boolean
   cellSize?: number
   sectionSize?: number
+  gridColor?: THREE.ColorRepresentation
+  sectionColor?: THREE.ColorRepresentation
+  fadeDistance?: number
+  fadeStrength?: number
   args?: [number?, number?] // Keep for compatibility, but don't use
 }
 
@@ -53,6 +57,10 @@ export const Grid: React.FC<GridProps> = ({
   infiniteGrid,
   cellSize = 1,
   sectionSize = 10,
+  gridColor = 0x5f5f5f,
+  sectionColor = 0xffffff,
+  fadeDistance = 180,
+  fadeStrength = 1.35,
 }) => {
   const { scene, camera } = useThree()
   const size = 1000 // A large plane for the "infinite" grid
@@ -68,10 +76,10 @@ export const Grid: React.FC<GridProps> = ({
       uniforms: {
         cellSize: { value: cellSize },
         sectionSize: { value: sectionSize },
-        gridColor: { value: new THREE.Color(0xeeeeee) },
-        sectionColor: { value: new THREE.Color(0xccccff) },
-        fadeDistance: { value: 100 }, // Fade out based on sectionSize
-        fadeStrength: { value: 1.5 },
+        gridColor: { value: new THREE.Color(gridColor) },
+        sectionColor: { value: new THREE.Color(sectionColor) },
+        fadeDistance: { value: fadeDistance },
+        fadeStrength: { value: fadeStrength },
       },
       transparent: true,
       side: THREE.DoubleSide,
@@ -82,7 +90,16 @@ export const Grid: React.FC<GridProps> = ({
       mesh.rotation.fromArray(rotation)
     }
     return mesh
-  }, [size, cellSize, sectionSize, rotation])
+  }, [
+    size,
+    cellSize,
+    sectionSize,
+    rotation,
+    gridColor,
+    sectionColor,
+    fadeDistance,
+    fadeStrength,
+  ])
 
   useFrame(() => {
     if (infiniteGrid) {

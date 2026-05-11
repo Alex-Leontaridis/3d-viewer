@@ -5,6 +5,9 @@ import { convertCSGToThreeGeom } from "jscad-electronics/vanilla"
 import * as THREE from "three"
 import { useMemo, useEffect } from "react"
 import ContainerWithTooltip from "src/ContainerWithTooltip"
+import { getDefaultEnvironmentMap } from "src/react-three/getDefaultEnvironmentMap"
+import { useThree } from "src/react-three/ThreeContext"
+import { applyComponentEnvironment } from "src/utils/apply-component-environment"
 import type { CadModelFitMode, CadModelSize } from "src/utils/cad-model-fit"
 import { useCadModelTransformGraph } from "./useCadModelTransformGraph"
 
@@ -37,6 +40,7 @@ export const JscadModel = ({
   scale?: number
   isTranslucent?: boolean
 }) => {
+  const { renderer } = useThree()
   const { threeGeom, material } = useMemo(() => {
     const jscadObject = executeJscadOperations(jscad as any, jscadPlan)
 
@@ -60,6 +64,8 @@ export const JscadModel = ({
     if (!threeGeom) return null
     const createdMesh = new THREE.Mesh(threeGeom, material)
     createdMesh.renderOrder = isTranslucent ? 2 : 1
+    createdMesh.castShadow = true
+    createdMesh.receiveShadow = true
     return createdMesh
   }, [threeGeom, material, isTranslucent])
   const { boardTransformGroup } = useCadModelTransformGraph({
@@ -85,6 +91,13 @@ export const JscadModel = ({
       material.emissiveIntensity = 0
     }
   }, [isHovered, material])
+
+  useEffect(() => {
+    if (!material || !renderer) return
+    const envMap = getDefaultEnvironmentMap(renderer)
+    if (!envMap) return
+    return applyComponentEnvironment(material, envMap) ?? undefined
+  }, [material, renderer])
 
   if (!threeGeom) return null
 
