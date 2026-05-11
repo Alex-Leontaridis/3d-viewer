@@ -1,6 +1,7 @@
 import * as THREE from "three"
 
-export const COMPONENT_ENV_MAP_INTENSITY = 0.52
+/** IBL on parts; keep below scene.environmentIntensity so metals do not blow out. */
+export const COMPONENT_ENV_MAP_INTENSITY = 0.18
 
 export function applyComponentEnvironment(
   material: THREE.Material,

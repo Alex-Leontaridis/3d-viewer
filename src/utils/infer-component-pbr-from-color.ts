@@ -18,12 +18,12 @@ export function inferComponentPbrFromColor(
 
   if (channelSpread < 0.14) {
     if (maxChannel > 0.58) {
-      return { metalness: 0.92, roughness: 0.26 }
+      return { metalness: 0.7, roughness: 0.55 }
     }
     if (maxChannel > 0.38) {
-      return { metalness: 0.88, roughness: 0.34 }
+      return { metalness: 0.66, roughness: 0.62 }
     }
-    return { metalness: 0.82, roughness: 0.48 }
+    return { metalness: 0.62, roughness: 0.7 }
   }
 
   return { metalness: 0.1, roughness: 0.64 }
@@ -36,7 +36,7 @@ export function meshPhongToMeshStandard(
   const shininess = phong.shininess ?? 30
   const gloss = Math.min(1, shininess / 140)
   const roughnessFromShininess = THREE.MathUtils.lerp(0.78, 0.22, gloss)
-  const roughness = Math.min(pbr.roughness, roughnessFromShininess)
+  const roughness = Math.max(pbr.roughness, roughnessFromShininess)
 
   const standard = new THREE.MeshStandardMaterial({
     color: phong.color.clone(),

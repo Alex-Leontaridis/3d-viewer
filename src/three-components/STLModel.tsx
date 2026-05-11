@@ -72,7 +72,7 @@ export function STLModel({
     const isSilkscreenLayer =
       layerType === "top-silkscreen" || layerType === "bottom-silkscreen"
     const componentPbr = isCopperLayer
-      ? { metalness: 0.8, roughness: 0.3 }
+      ? { metalness: 0.58, roughness: 0.58 }
       : isSilkscreenLayer
         ? { metalness: 0.03, roughness: 0.58 }
         : inferComponentPbrFromColor(resolvedThreeColor)
