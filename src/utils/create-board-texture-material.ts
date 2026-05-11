@@ -1,11 +1,12 @@
 import * as THREE from "three"
 import { FAUX_BOARD_OPACITY } from "../geoms/constants"
 
-export const BOARD_TEXTURE_ROUGHNESS = 0.92
+/** Base roughness for solid board mesh and for decals when no roughnessMap. */
+export const BOARD_TEXTURE_ROUGHNESS = 0.7
 export const BOARD_TEXTURE_METALNESS = 0.0
-export const BOARD_CLEARCOAT = 0
-export const BOARD_CLEARCOAT_ROUGHNESS = 1
-export const BOARD_TEXTURE_ENV_MAP_INTENSITY = 0.03
+export const BOARD_CLEARCOAT = 0.2
+export const BOARD_CLEARCOAT_ROUGHNESS = 0.35
+export const BOARD_TEXTURE_ENV_MAP_INTENSITY = 0.06
 export const BOARD_NORMAL_SCALE = 0.18
 
 export const getBoardSurfaceMaterialProps = ({
@@ -48,6 +49,8 @@ export const getBoardSurfaceMaterialProps = ({
 
 export interface CreateBoardTextureMaterialOptions {
   map: THREE.CanvasTexture
+  /** Per-pixel roughness; when set, `roughness` is 1 so map green channel is absolute roughness. */
+  roughnessMap?: THREE.CanvasTexture | null
   isFaux?: boolean
   polygonOffset?: boolean
   envMap?: THREE.Texture | null
@@ -55,12 +58,13 @@ export interface CreateBoardTextureMaterialOptions {
 
 export function createBoardTextureMaterial({
   map,
+  roughnessMap = null,
   isFaux = false,
   polygonOffset = false,
   envMap = null,
 }: CreateBoardTextureMaterialOptions): THREE.MeshPhysicalMaterial {
-  const material = new THREE.MeshPhysicalMaterial(
-    getBoardSurfaceMaterialProps({
+  const material = new THREE.MeshPhysicalMaterial({
+    ...getBoardSurfaceMaterialProps({
       color: 0xffffff,
       map,
       side: THREE.FrontSide,
@@ -70,7 +74,9 @@ export function createBoardTextureMaterial({
       polygonOffsetFactor: polygonOffset ? -4 : 0,
       polygonOffsetUnits: polygonOffset ? -4 : 0,
     }),
-  )
+    roughness: roughnessMap ? 1.0 : BOARD_TEXTURE_ROUGHNESS,
+    roughnessMap: roughnessMap ?? null,
+  })
   material.alphaTest = 0.08
   material.depthWrite = true
   material.normalScale.setScalar(BOARD_NORMAL_SCALE)

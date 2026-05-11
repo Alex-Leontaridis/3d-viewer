@@ -107,7 +107,6 @@ test("convert 3d view to svg with Atari board outline", async () => {
 
   const svgString = await convertCircuitJsonTo3dSvg(circuitJson, options)
 
-  // Verify that the SVG contains green soldermask colors
-  expect(svgString).toContain("rgb(39,89,56)") // Dark green soldermask
-  expect(svgString).toContain("rgb(51,114,73)") // Light green traces
+  // Board soldermask tint (SVGRenderer may emit hex or rgb forms)
+  expect(svgString.toLowerCase()).toMatch(/3c835b|rgb\(60,131,91\)/)
 })

@@ -8,8 +8,11 @@ export const BOARD_SURFACE_OFFSET = {
   copper: 0.002,
 } as const
 
-// FR4 solder mask (hex); `fr4SolderMaskGreen` is the same tint in linear RGB
-export const FR4_SOLDERMASK_HEX = 0x72c48a
+/** Z offset (mm) for board layer texture planes above/below the solid board mesh */
+export const TEXTURE_PLANE_Z_OFFSET_MM = 0.01
+
+// FR4 solder mask (hex): saturated mid green — readable under ACES without mint wash-out
+export const FR4_SOLDERMASK_HEX = 0x478264
 
 // Exposed copper / pads / traces tint (pale gold); drives textures and mesh layers
 export const COPPER_HEX = 0xe0d0b0
@@ -40,7 +43,7 @@ export const colors = {
   copper: copperRgb,
   fr4Tan: [0.6, 0.43, 0.28],
   fr4SolderMaskGreen: fr4SolderMaskFromHex(),
-  fr4TracesWithMaskGreen: [0.12, 0.42, 0.08],
+  fr4TracesWithMaskGreen: [0.09, 0.32, 0.18],
   fr4TracesWithoutMaskTan: [0.6, 0.43, 0.28],
   fr1Tan: [0.8, 0.4, 0.2],
   fr1TracesWithMaskCopper: copperRgb,

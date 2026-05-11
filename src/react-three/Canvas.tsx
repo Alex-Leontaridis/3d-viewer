@@ -8,6 +8,9 @@ import React, {
   useMemo,
 } from "react"
 import * as THREE from "three"
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js"
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js"
+import { SMAAPass } from "three/examples/jsm/postprocessing/SMAAPass.js"
 import { ThreeContext, ThreeContextState } from "./ThreeContext"
 import { HoverProvider } from "./HoverContext"
 import { removeExistingCanvases } from "./remove-existing-canvases"
@@ -81,15 +84,36 @@ export const Canvas = forwardRef<THREE.Object3D, CanvasProps>(
     useEffect(() => {
       if (!mountRef.current) return
 
+      const canvasBg =
+        typeof style?.backgroundColor === "string"
+          ? style.backgroundColor
+          : undefined
+      if (canvasBg) {
+        try {
+          scene.background = new THREE.Color(canvasBg)
+        } catch {
+          scene.background = null
+        }
+      } else {
+        scene.background = null
+      }
+
       removeExistingCanvases(mountRef.current)
 
-      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
+      // MSAA on the renderer does not antialias post-blended transparency; SMAA runs on the full framebuffer.
+      const renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true })
       configureRenderer(renderer)
       renderer.setSize(
         mountRef.current.clientWidth,
         mountRef.current.clientHeight,
       )
-      renderer.setPixelRatio(window.devicePixelRatio)
+      const pixelRatio = window.devicePixelRatio
+      renderer.setPixelRatio(pixelRatio)
+
+      const composer = new EffectComposer(renderer)
+      composer.setPixelRatio(pixelRatio)
+      composer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight)
+
       mountRef.current.appendChild(renderer.domElement)
 
       const aspect =
@@ -125,6 +149,14 @@ export const Canvas = forwardRef<THREE.Object3D, CanvasProps>(
         camera.lookAt(0, 0, 0)
       }
 
+      const renderPass = new RenderPass(scene, camera)
+      composer.addPass(renderPass)
+      const smaaPass = new SMAAPass(
+        mountRef.current.clientWidth * pixelRatio,
+        mountRef.current.clientHeight * pixelRatio,
+      )
+      composer.addPass(smaaPass)
+
       scene.add(rootObject.current)
       window.__TSCIRCUIT_THREE_OBJECT = rootObject.current
 
@@ -144,7 +176,7 @@ export const Canvas = forwardRef<THREE.Object3D, CanvasProps>(
         const time = clock.getElapsedTime()
         const delta = clock.getDelta()
         frameListeners.current.forEach((listener) => listener(time, delta))
-        renderer.render(scene, camera)
+        composer.render()
         animationFrameId = requestAnimationFrame(animate)
       }
       animate()
@@ -166,6 +198,10 @@ export const Canvas = forwardRef<THREE.Object3D, CanvasProps>(
             mountRef.current.clientWidth,
             mountRef.current.clientHeight,
           )
+          composer.setSize(
+            mountRef.current.clientWidth,
+            mountRef.current.clientHeight,
+          )
         }
       }
       window.addEventListener("resize", handleResize)
@@ -183,13 +219,16 @@ export const Canvas = forwardRef<THREE.Object3D, CanvasProps>(
         if (mountRef.current && renderer.domElement) {
           mountRef.current.removeChild(renderer.domElement)
         }
+        smaaPass.dispose()
+        composer.dispose()
         renderer.dispose()
         scene.remove(rootObject.current)
         if (window.__TSCIRCUIT_THREE_OBJECT === rootObject.current) {
           window.__TSCIRCUIT_THREE_OBJECT = undefined
         }
+        scene.background = null
       }
-    }, [scene, addFrameListener, removeFrameListener, cameraType])
+    }, [scene, addFrameListener, removeFrameListener, cameraType, style?.backgroundColor])
 
     return (
       <div ref={mountRef} style={{ width: "100%", height: "100%", ...style }}>

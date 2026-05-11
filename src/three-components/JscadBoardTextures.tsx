@@ -4,7 +4,7 @@ import { useEffect, useMemo } from "react"
 import { createCombinedBoardTextures } from "src/textures"
 import * as THREE from "three"
 import { useLayerVisibility } from "../contexts/LayerVisibilityContext"
-import { TRACE_TEXTURE_RESOLUTION } from "../geoms/constants"
+import { TRACE_TEXTURE_RESOLUTION, TEXTURE_PLANE_Z_OFFSET_MM } from "../geoms/constants"
 import { useThree } from "../react-three/ThreeContext"
 import { getDefaultEnvironmentMap } from "../react-three/getDefaultEnvironmentMap"
 import {
@@ -109,6 +109,7 @@ export function JscadBoardTextures({
 
     const createTexturePlane = (
       texture: THREE.CanvasTexture | null | undefined,
+      roughnessMap: THREE.CanvasTexture | null | undefined,
       zOffset: number,
       isBottomLayer: boolean,
       name: string,
@@ -126,6 +127,7 @@ export function JscadBoardTextures({
       )
       const material = createBoardTextureMaterial({
         map: texture,
+        roughnessMap: roughnessMap ?? null,
         isFaux,
         polygonOffset: usePolygonOffset,
       })
@@ -147,12 +149,12 @@ export function JscadBoardTextures({
       return mesh
     }
 
-    // Small offset to place textures just above board surface (same as Manifold)
-    const SURFACE_OFFSET = 0.005
+    const zOffset = TEXTURE_PLANE_Z_OFFSET_MM
 
     const topBoardMesh = createTexturePlane(
       textures.topBoard,
-      pcbThickness / 2 + SURFACE_OFFSET,
+      textures.topRoughness,
+      pcbThickness / 2 + zOffset,
       false,
       "jscad-top-board-texture",
       true,
@@ -164,7 +166,8 @@ export function JscadBoardTextures({
 
     const bottomBoardMesh = createTexturePlane(
       textures.bottomBoard,
-      -pcbThickness / 2 - SURFACE_OFFSET,
+      textures.bottomRoughness,
+      -pcbThickness / 2 - zOffset,
       true,
       "jscad-bottom-board-texture",
       true,
@@ -218,7 +221,9 @@ export function JscadBoardTextures({
       })
 
       textures.topBoard?.dispose()
+      textures.topRoughness?.dispose()
       textures.bottomBoard?.dispose()
+      textures.bottomRoughness?.dispose()
     }
   }, [rootObject, boardData, textures, pcbThickness, renderer, isFaux])
 

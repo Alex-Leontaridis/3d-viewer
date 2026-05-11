@@ -1,11 +1,13 @@
 import type { PcbBoard } from "circuit-json"
 import * as THREE from "three"
+import { TEXTURE_PLANE_Z_OFFSET_MM } from "../geoms/constants"
 import { createBoardTextureMaterial } from "../utils/create-board-texture-material"
 import { calculateOutlineBounds } from "../utils/outline-bounds"
 import type { CombinedBoardTextures } from "./index"
 
 interface TexturePlaneConfig {
   texture: THREE.CanvasTexture | null | undefined
+  roughnessMap?: THREE.CanvasTexture | null | undefined
   yOffset: number
   isBottomLayer: boolean
   usePolygonOffset?: boolean
@@ -19,6 +21,7 @@ function createTexturePlane(
 ): THREE.Mesh | null {
   const {
     texture,
+    roughnessMap,
     yOffset,
     isBottomLayer,
     usePolygonOffset = false,
@@ -36,6 +39,7 @@ function createTexturePlane(
   )
   const material = createBoardTextureMaterial({
     map: texture,
+    roughnessMap: roughnessMap ?? null,
     isFaux,
     polygonOffset: usePolygonOffset,
   })
@@ -63,12 +67,13 @@ export function createTextureMeshes(
 ): THREE.Mesh[] {
   const meshes: THREE.Mesh[] = []
   if (!textures || !boardData || pcbThickness === null) return meshes
-  const SURFACE_OFFSET = 0.005
+  const zOffset = TEXTURE_PLANE_Z_OFFSET_MM
 
   const topBoardMesh = createTexturePlane(
     {
       texture: textures.topBoard,
-      yOffset: pcbThickness / 2 + SURFACE_OFFSET,
+      roughnessMap: textures.topRoughness,
+      yOffset: pcbThickness / 2 + zOffset,
       isBottomLayer: false,
       usePolygonOffset: true,
       renderOrder: 1,
@@ -81,7 +86,8 @@ export function createTextureMeshes(
   const bottomBoardMesh = createTexturePlane(
     {
       texture: textures.bottomBoard,
-      yOffset: -pcbThickness / 2 - SURFACE_OFFSET,
+      roughnessMap: textures.bottomRoughness,
+      yOffset: -pcbThickness / 2 - zOffset,
       isBottomLayer: true,
       usePolygonOffset: true,
       renderOrder: 1,

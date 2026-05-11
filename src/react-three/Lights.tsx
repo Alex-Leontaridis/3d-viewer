@@ -22,21 +22,21 @@ export const Lights: React.FC = () => {
     const previousEnv = scene.environment
     const previousIntensity = scene.environmentIntensity
     scene.environment = pmrem
-    scene.environmentIntensity = 0.38
+    scene.environmentIntensity = 0.7
     return () => {
       scene.environment = previousEnv ?? null
       scene.environmentIntensity = previousIntensity
     }
   }, [scene, renderer])
 
-  const ambientLight = useMemo(() => new THREE.AmbientLight(0xffffff, 1.1), [])
+  const ambientLight = useMemo(() => new THREE.AmbientLight(0xffffff, 3), [])
   const hemisphereLight = useMemo(
-    () => new THREE.HemisphereLight(0xf7fbff, 0x353535, 0.42),
+    () => new THREE.HemisphereLight(0xf7fbff, 0x353535, 0.5),
     [],
   )
 
   const keyLight = useMemo(() => {
-    const light = new THREE.DirectionalLight(0xfff7e8, 0.22)
+    const light = new THREE.DirectionalLight(0xfff7e8, 0.26)
     light.position.set(7, 12, 8)
     light.castShadow = true
     light.shadow.mapSize.set(2048, 2048)
