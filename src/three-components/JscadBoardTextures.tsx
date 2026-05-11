@@ -110,6 +110,7 @@ export function JscadBoardTextures({
     const createTexturePlane = (
       texture: THREE.CanvasTexture | null | undefined,
       roughnessMap: THREE.CanvasTexture | null | undefined,
+      bumpMap: THREE.CanvasTexture | null | undefined,
       zOffset: number,
       isBottomLayer: boolean,
       name: string,
@@ -128,6 +129,7 @@ export function JscadBoardTextures({
       const material = createBoardTextureMaterial({
         map: texture,
         roughnessMap: roughnessMap ?? null,
+        bumpMap: bumpMap ?? null,
         isFaux,
         polygonOffset: usePolygonOffset,
       })
@@ -154,6 +156,7 @@ export function JscadBoardTextures({
     const topBoardMesh = createTexturePlane(
       textures.topBoard,
       textures.topRoughness,
+      textures.topBumpMap,
       pcbThickness / 2 + zOffset,
       false,
       "jscad-top-board-texture",
@@ -167,6 +170,7 @@ export function JscadBoardTextures({
     const bottomBoardMesh = createTexturePlane(
       textures.bottomBoard,
       textures.bottomRoughness,
+      textures.bottomBumpMap,
       -pcbThickness / 2 - zOffset,
       true,
       "jscad-bottom-board-texture",
@@ -222,8 +226,10 @@ export function JscadBoardTextures({
 
       textures.topBoard?.dispose()
       textures.topRoughness?.dispose()
+      textures.topBumpMap?.dispose()
       textures.bottomBoard?.dispose()
       textures.bottomRoughness?.dispose()
+      textures.bottomBumpMap?.dispose()
     }
   }, [rootObject, boardData, textures, pcbThickness, renderer, isFaux])
 

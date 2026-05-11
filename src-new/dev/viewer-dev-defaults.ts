@@ -3,7 +3,7 @@
  * `src/dev/viewer-dev-defaults.ts` (inlined so `src-new` does not depend on
  * excluded board-texture or geom modules).
  */
-const FR4_SOLDERMASK_HEX = 0x478264
+const FR4_SOLDERMASK_HEX = 0x3f7d5f
 const BOARD_TEXTURE_ROUGHNESS = 0.7
 const BOARD_CLEARCOAT = 0.2
 const BOARD_CLEARCOAT_ROUGHNESS = 0.35

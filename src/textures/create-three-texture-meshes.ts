@@ -8,6 +8,7 @@ import type { CombinedBoardTextures } from "./index"
 interface TexturePlaneConfig {
   texture: THREE.CanvasTexture | null | undefined
   roughnessMap?: THREE.CanvasTexture | null | undefined
+  bumpMap?: THREE.CanvasTexture | null | undefined
   yOffset: number
   isBottomLayer: boolean
   usePolygonOffset?: boolean
@@ -22,6 +23,7 @@ function createTexturePlane(
   const {
     texture,
     roughnessMap,
+    bumpMap,
     yOffset,
     isBottomLayer,
     usePolygonOffset = false,
@@ -40,6 +42,7 @@ function createTexturePlane(
   const material = createBoardTextureMaterial({
     map: texture,
     roughnessMap: roughnessMap ?? null,
+    bumpMap: bumpMap ?? null,
     isFaux,
     polygonOffset: usePolygonOffset,
   })
@@ -73,6 +76,7 @@ export function createTextureMeshes(
     {
       texture: textures.topBoard,
       roughnessMap: textures.topRoughness,
+      bumpMap: textures.topBumpMap,
       yOffset: pcbThickness / 2 + zOffset,
       isBottomLayer: false,
       usePolygonOffset: true,
@@ -87,6 +91,7 @@ export function createTextureMeshes(
     {
       texture: textures.bottomBoard,
       roughnessMap: textures.bottomRoughness,
+      bumpMap: textures.bottomBumpMap,
       yOffset: -pcbThickness / 2 - zOffset,
       isBottomLayer: true,
       usePolygonOffset: true,

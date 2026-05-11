@@ -16,14 +16,25 @@ import { createThroughHoleTextureForLayer } from "./create-through-hole-texture-
 
 /** Soldermask / silk baseline (Three.js roughnessMap green channel, 0–1). */
 const ROUGHNESS_MASK = 0.72
-/** Exposed copper regions — smoother than mask. */
-const ROUGHNESS_COPPER = 0.22
+/** Exposed copper regions — slightly rougher than mirror so grooves read matte. */
+const ROUGHNESS_COPPER = 0.38
+
+/** Bump map: neutral soldermask (Three.js bump — mid gray = no offset). */
+const BUMP_NEUTRAL = 0.5
+/** Darkening inside merged copper mask (recessed channel / trench). */
+const BUMP_RECESS_DEPTH = 0.11
+/** Brighten soldermask lip at copper boundary (edge catches light). */
+const BUMP_EDGE_RIM = 0.07
+/** Box-blur radius (px) on copper alpha before Sobel edge detect. */
+const BUMP_ALPHA_BLUR_RADIUS = 2
 
 export interface CombinedBoardTextures {
   topBoard?: THREE.CanvasTexture | null
   bottomBoard?: THREE.CanvasTexture | null
   topRoughness?: THREE.CanvasTexture | null
   bottomRoughness?: THREE.CanvasTexture | null
+  topBumpMap?: THREE.CanvasTexture | null
+  bottomBumpMap?: THREE.CanvasTexture | null
 }
 
 const toRgb = (colorArr: number[]) => {
@@ -83,6 +94,188 @@ const configureRoughnessTexture = (texture: THREE.CanvasTexture) => {
   texture.minFilter = THREE.LinearFilter
   texture.magFilter = THREE.LinearFilter
   texture.needsUpdate = true
+}
+
+const configureBumpTexture = (texture: THREE.CanvasTexture) => {
+  texture.colorSpace = THREE.NoColorSpace
+  texture.generateMipmaps = false
+  texture.minFilter = THREE.LinearFilter
+  texture.magFilter = THREE.LinearFilter
+  texture.needsUpdate = true
+}
+
+const boxBlurAlpha1D = (
+  src: Float32Array,
+  dst: Float32Array,
+  w: number,
+  h: number,
+  horizontal: boolean,
+  radius: number,
+) => {
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      let sum = 0
+      let count = 0
+      for (let k = -radius; k <= radius; k++) {
+        const sx = horizontal ? x + k : x
+        const sy = horizontal ? y : y + k
+        if (sx >= 0 && sx < w && sy >= 0 && sy < h) {
+          sum += src[sy * w + sx] ?? 0
+          count++
+        }
+      }
+      dst[y * w + x] = count > 0 ? sum / count : 0
+    }
+  }
+}
+
+/**
+ * Grayscale bump from merged copper alpha: recessed interior + subtle raised rim
+ * at mask edges so traces read engraved under grazing light.
+ */
+const createBumpMapFromCopperLayers = ({
+  copperTextures,
+  boardData,
+  traceTextureResolution,
+}: {
+  copperTextures: Array<THREE.CanvasTexture | null | undefined>
+  boardData: PcbBoard
+  traceTextureResolution: number
+}): THREE.CanvasTexture | null => {
+  const hasCopper = copperTextures.some((t) => t?.image)
+  if (!hasCopper) return null
+
+  const boardOutlineBounds = calculateOutlineBounds(boardData)
+  const canvasWidth = Math.floor(
+    boardOutlineBounds.width * traceTextureResolution,
+  )
+  const canvasHeight = Math.floor(
+    boardOutlineBounds.height * traceTextureResolution,
+  )
+  if (canvasWidth <= 0 || canvasHeight <= 0) return null
+
+  const mergeCanvas = document.createElement("canvas")
+  mergeCanvas.width = canvasWidth
+  const mergeH = canvasHeight + 1
+  mergeCanvas.height = mergeH
+  const mctx = mergeCanvas.getContext("2d")
+  if (!mctx) return null
+
+  mctx.clearRect(0, 0, canvasWidth, mergeH)
+  for (const tex of copperTextures) {
+    if (!tex?.image) continue
+    const image = tex.image as HTMLCanvasElement
+    mctx.globalCompositeOperation = "source-over"
+    mctx.drawImage(image, 0, 0, canvasWidth, canvasHeight)
+  }
+
+  const imageData = mctx.getImageData(0, 0, canvasWidth, mergeH)
+  const { data, width: w, height: h } = imageData
+  const n = w * h
+  const alpha = new Float32Array(n)
+  for (let i = 0; i < n; i++) {
+    alpha[i] = (data[i * 4 + 3] ?? 0) / 255
+  }
+
+  const tmp = new Float32Array(n)
+  const work = new Float32Array(n)
+  work.set(alpha)
+  let blurA = work
+  let blurB = tmp
+  for (let pass = 0; pass < BUMP_ALPHA_BLUR_RADIUS; pass++) {
+    boxBlurAlpha1D(blurA, blurB, w, h, true, 1)
+    boxBlurAlpha1D(blurB, blurA, w, h, false, 1)
+  }
+  const blurred = blurA
+  const b = (idx: number) => blurred[idx] ?? 0
+
+  const outData = mctx.createImageData(w, h)
+  const out = outData.data
+
+  if (h < 3 || w < 3) {
+    for (let yi = 0; yi < h; yi++) {
+      for (let xi = 0; xi < w; xi++) {
+        const idx = yi * w + xi
+        const al = b(idx)
+        let bump = BUMP_NEUTRAL - BUMP_RECESS_DEPTH * al
+        bump = Math.max(0, Math.min(1, bump))
+        const v = Math.round(bump * 255)
+        const o = idx * 4
+        out[o] = v
+        out[o + 1] = v
+        out[o + 2] = v
+        out[o + 3] = 255
+      }
+    }
+  } else {
+    for (let y = 1; y < h - 1; y++) {
+      for (let x = 1; x < w - 1; x++) {
+        const i = y * w + x
+        const gx =
+          -b((y - 1) * w + x - 1) +
+          b((y - 1) * w + x + 1) +
+          -2 * b(y * w + x - 1) +
+          2 * b(y * w + x + 1) +
+          -b((y + 1) * w + x - 1) +
+          b((y + 1) * w + x + 1)
+        const gy =
+          -b((y - 1) * w + x - 1) +
+          -2 * b((y - 1) * w + x) +
+          -b((y - 1) * w + x + 1) +
+          b((y + 1) * w + x - 1) +
+          2 * b((y + 1) * w + x) +
+          b((y + 1) * w + x + 1)
+        const edgeMag = Math.min(1, Math.hypot(gx, gy) * 0.35)
+        const al = b(i)
+        let bump =
+          BUMP_NEUTRAL - BUMP_RECESS_DEPTH * al + BUMP_EDGE_RIM * edgeMag
+        bump = Math.max(0, Math.min(1, bump))
+        const v = Math.round(bump * 255)
+        const o = i * 4
+        out[o] = v
+        out[o + 1] = v
+        out[o + 2] = v
+        out[o + 3] = 255
+      }
+    }
+
+    // Fill edge pixels from adjacent interior (Sobel skipped y=0,h-1 and x=0,w-1)
+    for (let x = 0; x < w; x++) {
+      const srcRow = 1 * w * 4 + x * 4
+      const dstRow = 0 * w * 4 + x * 4
+      for (let k = 0; k < 4; k++) {
+        out[dstRow + k] = out[srcRow + k] ?? 0
+      }
+      const srcRow2 = (h - 2) * w * 4 + x * 4
+      const dstRow2 = (h - 1) * w * 4 + x * 4
+      for (let k = 0; k < 4; k++) {
+        out[dstRow2 + k] = out[srcRow2 + k] ?? 0
+      }
+    }
+    for (let y = 0; y < h; y++) {
+      const srcCol = (y * w + 1) * 4
+      const dstCol = (y * w + 0) * 4
+      for (let k = 0; k < 4; k++) {
+        out[dstCol + k] = out[srcCol + k] ?? 0
+      }
+      const srcCol2 = (y * w + (w - 2)) * 4
+      const dstCol2 = (y * w + (w - 1)) * 4
+      for (let k = 0; k < 4; k++) {
+        out[dstCol2 + k] = out[srcCol2 + k] ?? 0
+      }
+    }
+  }
+
+  const bumpCanvas = document.createElement("canvas")
+  bumpCanvas.width = w
+  bumpCanvas.height = h
+  const bctx = bumpCanvas.getContext("2d")
+  if (!bctx) return null
+  bctx.putImageData(outData, 0, 0)
+
+  const bumpTexture = new THREE.CanvasTexture(bumpCanvas)
+  configureBumpTexture(bumpTexture)
+  return bumpTexture
 }
 
 /**
@@ -300,7 +493,22 @@ export function createCombinedBoardTextures({
         })
       : null
 
-    return { albedo, roughness }
+    const copperForBump = [
+      copperPourTexture,
+      traceTexture,
+      padTexture,
+      throughHoleTexture,
+      copperTextTexture,
+    ]
+    const bumpMap = albedo
+      ? createBumpMapFromCopperLayers({
+          copperTextures: copperForBump,
+          boardData,
+          traceTextureResolution,
+        })
+      : null
+
+    return { albedo, roughness, bumpMap }
   }
 
   const numLayers = boardData.num_layers ?? 2
@@ -311,7 +519,9 @@ export function createCombinedBoardTextures({
   return {
     topBoard: top.albedo,
     topRoughness: top.roughness,
+    topBumpMap: top.bumpMap,
     bottomBoard: bottom?.albedo ?? null,
     bottomRoughness: bottom?.roughness ?? null,
+    bottomBumpMap: bottom?.bumpMap ?? null,
   }
 }

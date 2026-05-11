@@ -8,6 +8,8 @@ import type {
 import {
   colors as defaultColors,
   soldermaskColors,
+  FR4_TRACE_UNDER_MASK_ALPHA,
+  SOLDERMASK_TEXTURE_ALPHA,
 } from "../../geoms/constants"
 import type { OutlineBounds } from "../../utils/outline-bounds"
 
@@ -16,6 +18,13 @@ const toRgb = (colorArr: number[]) => {
   return `rgb(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(
     b * 255,
   )})`
+}
+
+const toRgba = (colorArr: number[], a: number) => {
+  const [r = 0, g = 0, b = 0] = colorArr
+  return `rgba(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(
+    b * 255,
+  )}, ${a})`
 }
 
 type SoldermaskPalette = {
@@ -28,13 +37,17 @@ type SoldermaskPalette = {
 const getSoldermaskPalette = (
   material: PcbBoard["material"],
 ): SoldermaskPalette => {
-  const soldermask = toRgb(
+  const soldermask = toRgba(
     soldermaskColors[material] ?? defaultColors.fr4SolderMaskGreen,
+    SOLDERMASK_TEXTURE_ALPHA,
   )
   const soldermaskOverCopper =
     material === "fr1"
       ? toRgb(defaultColors.fr1TracesWithMaskCopper)
-      : toRgb(defaultColors.fr4TracesWithMaskGreen)
+      : toRgba(
+          defaultColors.fr4TracesWithMaskGreen,
+          FR4_TRACE_UNDER_MASK_ALPHA,
+        )
 
   return {
     soldermask,
