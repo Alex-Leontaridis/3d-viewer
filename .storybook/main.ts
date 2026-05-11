@@ -1,5 +1,6 @@
 import type { StorybookConfig } from "@storybook/react-vite"
 import path from "path"
+
 const addProxyLogging = (proxy: any) => {
   proxy.on("error", (err, req, res) => {
     console.error("proxy error", err)
@@ -28,6 +29,7 @@ const config: StorybookConfig = {
       resolve: {
         alias: {
           src: path.resolve(__dirname, "../src"),
+          "src-new": path.resolve(__dirname, "../src-new"),
         },
       },
       server: {
