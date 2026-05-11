@@ -35,15 +35,15 @@ export interface ViewerDevParams {
 }
 
 export const VIEWER_DEV_DEFAULT_PARAMS: ViewerDevParams = {
-  toneMappingExposure: 0.9,
-  environmentIntensity: 0.7,
-  ambientIntensity: 1.28,
-  hemisphereIntensity: 0.5,
+  toneMappingExposure: 1.08,
+  environmentIntensity: 0.78,
+  ambientIntensity: 0.85,
+  hemisphereIntensity: 0.62,
   keyLightIntensity: 0.26,
-  fillLightIntensity: 0.32,
-  bounceLightIntensity: 0.24,
-  cameraSideFillIntensity: 0.2,
-  ceilingRectIntensity: 1.9,
+  fillLightIntensity: 0.38,
+  bounceLightIntensity: 0.3,
+  cameraSideFillIntensity: 0.26,
+  ceilingRectIntensity: 1.05,
   fr4SolderMaskHex: FR4_SOLDERMASK_HEX,
   boardRoughness: BOARD_TEXTURE_ROUGHNESS,
   boardClearcoat: BOARD_CLEARCOAT,

@@ -157,6 +157,8 @@ export const Canvas = forwardRef<THREE.Object3D, CanvasProps>(
       )
       composer.addPass(smaaPass)
 
+      const mountEl = mountRef.current
+
       scene.add(rootObject.current)
       window.__TSCIRCUIT_THREE_OBJECT = rootObject.current
 
@@ -181,30 +183,36 @@ export const Canvas = forwardRef<THREE.Object3D, CanvasProps>(
       }
       animate()
 
-      const handleResize = () => {
-        if (mountRef.current) {
-          const newAspect =
-            mountRef.current.clientWidth / mountRef.current.clientHeight
-          if (camera instanceof THREE.PerspectiveCamera) {
-            camera.aspect = newAspect
-          } else if (camera instanceof THREE.OrthographicCamera) {
-            camera.left = -10 * newAspect
-            camera.right = 10 * newAspect
-            camera.top = 10
-            camera.bottom = -10
-          }
-          camera.updateProjectionMatrix()
-          renderer.setSize(
-            mountRef.current.clientWidth,
-            mountRef.current.clientHeight,
-          )
-          composer.setSize(
-            mountRef.current.clientWidth,
-            mountRef.current.clientHeight,
-          )
+      const updateDimensions = () => {
+        if (!mountEl) return
+        const w = mountEl.clientWidth
+        const h = mountEl.clientHeight
+        if (w === 0 || h === 0) return
+        const newAspect = w / h
+        if (camera instanceof THREE.PerspectiveCamera) {
+          camera.aspect = newAspect
+        } else if (camera instanceof THREE.OrthographicCamera) {
+          camera.left = -10 * newAspect
+          camera.right = 10 * newAspect
+          camera.top = 10
+          camera.bottom = -10
         }
+        camera.updateProjectionMatrix()
+        const nextPixelRatio = window.devicePixelRatio
+        renderer.setPixelRatio(nextPixelRatio)
+        renderer.setSize(w, h)
+        composer.setPixelRatio(nextPixelRatio)
+        composer.setSize(w, h)
       }
-      window.addEventListener("resize", handleResize)
+
+      window.addEventListener("resize", updateDimensions)
+      const resizeObserver =
+        typeof ResizeObserver !== "undefined"
+          ? new ResizeObserver(() => {
+              updateDimensions()
+            })
+          : null
+      resizeObserver?.observe(mountEl)
 
       return () => {
         // Save camera state before cleanup so it can be restored when switching camera types
@@ -214,7 +222,8 @@ export const Canvas = forwardRef<THREE.Object3D, CanvasProps>(
           up: camera.up.clone(),
         }
 
-        window.removeEventListener("resize", handleResize)
+        resizeObserver?.disconnect()
+        window.removeEventListener("resize", updateDimensions)
         cancelAnimationFrame(animationFrameId)
         if (mountRef.current && renderer.domElement) {
           mountRef.current.removeChild(renderer.domElement)

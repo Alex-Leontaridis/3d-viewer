@@ -22,16 +22,16 @@ export const Lights: React.FC = () => {
     const previousEnv = scene.environment
     const previousIntensity = scene.environmentIntensity
     scene.environment = pmrem
-    scene.environmentIntensity = 0.7
+    scene.environmentIntensity = 0.78
     return () => {
       scene.environment = previousEnv ?? null
       scene.environmentIntensity = previousIntensity
     }
   }, [scene, renderer])
 
-  const ambientLight = useMemo(() => new THREE.AmbientLight(0xffffff, 3), [])
+  const ambientLight = useMemo(() => new THREE.AmbientLight(0xffffff, 0.85), [])
   const hemisphereLight = useMemo(
-    () => new THREE.HemisphereLight(0xf7fbff, 0x353535, 0.5),
+    () => new THREE.HemisphereLight(0xf7fbff, 0x353535, 0.62),
     [],
   )
 
@@ -44,32 +44,33 @@ export const Lights: React.FC = () => {
     light.shadow.normalBias = 0.028
     light.shadow.radius = 22
     light.shadow.camera.near = 0.5
-    light.shadow.camera.far = 50
-    light.shadow.camera.left = -20
-    light.shadow.camera.right = 20
-    light.shadow.camera.top = 20
-    light.shadow.camera.bottom = -20
+    light.shadow.camera.far = 42
+    // Tight ortho frustum for mm-scale PCBs so the 2048² shadow map isn't wasted on empty space.
+    light.shadow.camera.left = -14
+    light.shadow.camera.right = 14
+    light.shadow.camera.top = 14
+    light.shadow.camera.bottom = -14
     return light
   }, [])
 
   const fillLight = useMemo(() => {
-    const light = new THREE.DirectionalLight(0xffffff, 0.32)
+    const light = new THREE.DirectionalLight(0xffffff, 0.38)
     light.position.set(-10, 9, 7)
     return light
   }, [])
   const bounceLight = useMemo(() => {
-    const light = new THREE.DirectionalLight(0xffffff, 0.24)
+    const light = new THREE.DirectionalLight(0xffffff, 0.3)
     light.position.set(0, -10, 5)
     return light
   }, [])
   const cameraSideFill = useMemo(() => {
-    const light = new THREE.DirectionalLight(0xffffff, 0.2)
+    const light = new THREE.DirectionalLight(0xffffff, 0.26)
     light.position.set(12, -8, 12)
     return light
   }, [])
 
   const ceilingRectLight = useMemo(() => {
-    const light = new THREE.RectAreaLight(0xffffff, 1.9, 42, 42)
+    const light = new THREE.RectAreaLight(0xffffff, 1.05, 42, 42)
     light.position.set(0, 14, 14)
     return light
   }, [])

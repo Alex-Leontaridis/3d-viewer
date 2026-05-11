@@ -12,7 +12,7 @@ export const BOARD_SURFACE_OFFSET = {
 export const TEXTURE_PLANE_Z_OFFSET_MM = 0.01
 
 // FR4 solder mask (hex): green — readable under ACES without mint wash-out
-export const FR4_SOLDERMASK_HEX = 0x3f7d5f
+export const FR4_SOLDERMASK_HEX = 0x4a8b6a
 
 const FR4_SUBSTRATE_R = 232
 const FR4_SUBSTRATE_G = 220
