@@ -8,77 +8,10 @@ import {
   MeshStandardMaterial,
 } from "three"
 import { GLTFExporter } from "three-stdlib"
+import { loadOcctImport } from "src/lib/loadOcctImport"
+import type { OcctMesh } from "src/lib/loadOcctImport"
 import { GltfModel } from "./GltfModel"
 import type { CadModelFitMode, CadModelSize } from "src/utils/cad-model-fit"
-
-type OcctImportParams = {
-  linearUnit?: "millimeter" | "centimeter" | "meter" | "inch" | "foot"
-  linearDeflectionType?: "bounding_box_ratio" | "absolute_value"
-  linearDeflection?: number
-  angularDeflection?: number
-}
-
-type OcctMesh = {
-  name: string
-  color?: [number, number, number]
-  attributes: {
-    position: { array: number[] }
-    normal?: { array: number[] }
-  }
-  index: { array: number[] }
-}
-
-type OcctImportResult = {
-  success: boolean
-  meshes: OcctMesh[]
-}
-
-type OcctImport = {
-  ReadStepFile(
-    content: ArrayBufferView | ArrayBuffer,
-    params: OcctImportParams | null,
-  ): OcctImportResult
-}
-
-type OcctImportModuleConfig = {
-  locateFile?: (path: string) => string
-}
-
-type OcctImportFactory = (
-  config?: OcctImportModuleConfig,
-) => Promise<OcctImport>
-
-let occtImportPromise: Promise<OcctImport> | undefined
-const OCCT_CDN_BASE_URL =
-  "https://cdn.jsdelivr.net/npm/occt-import-js@0.0.23/dist"
-
-function resolveOcctFactory(candidate: unknown): OcctImportFactory {
-  if (typeof candidate === "function") {
-    return candidate as OcctImportFactory
-  }
-  if (
-    candidate &&
-    typeof candidate === "object" &&
-    "default" in candidate &&
-    typeof (candidate as { default: unknown }).default === "function"
-  ) {
-    return (candidate as { default: unknown }).default as OcctImportFactory
-  }
-  throw new Error("Unable to resolve occt-import-js factory export")
-}
-
-async function loadOcctImport(): Promise<OcctImport> {
-  if (!occtImportPromise) {
-    const imported = await import(
-      /* @vite-ignore */ "https://cdn.jsdelivr.net/npm/occt-import-js@0.0.23/+esm"
-    )
-    const factory = resolveOcctFactory(imported)
-    occtImportPromise = factory({
-      locateFile: (path: string) => `${OCCT_CDN_BASE_URL}/${path}`,
-    })
-  }
-  return occtImportPromise
-}
 
 function occtMeshesToGroup(meshes: OcctMesh[]): Group {
   const group = new Group()

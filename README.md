@@ -10,7 +10,7 @@ Same demo board (USB-C, tactile switch, **R1**, **LED**): **before** = upstream 
 
 | Before (original library) | After (this library) |
 | --- | --- |
-| ![Before: original 3d viewer](./readme-assets/before-original-viewer.png) | ![After: this library](./readme-assets/after-this-library.png) |
+| ![Before: original 3d viewer](https://raw.githubusercontent.com/Alex-Leontaridis/3d-viewer/main/readme-assets/before-original-viewer.png) | ![After: this library](https://raw.githubusercontent.com/Alex-Leontaridis/3d-viewer/main/readme-assets/after-this-library.png) |
 
 ## What changed in this fork
 

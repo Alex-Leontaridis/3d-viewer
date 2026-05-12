@@ -1,6 +1,7 @@
 {
   "name": "@aleontaridis/pcb-3d-viewer",
   "version": "1.0.0",
+  "description": "React 3D PCB viewer for Circuit JSON",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "type": "module",
@@ -34,6 +35,7 @@
     "circuit-json": "^0.0.421",
     "circuit-to-canvas": "^0.0.102",
     "react-hot-toast": "^2.6.0",
+    "occt-import-js": "0.0.23",
     "three": "^0.165.0",
     "three-stdlib": "^2.36.0",
     "troika-three-text": "^0.52.4"
@@ -81,5 +83,12 @@
     "typescript": "^5.7.3",
     "vite": "^7.1.5",
     "vite-tsconfig-paths": "^4.3.2"
-  }
+  },
+  "directories": {
+    "lib": "lib",
+    "test": "tests"
+  },
+  "author": "",
+  "license": "ISC",
+  "types": "./dist/index.d.ts"
 }
