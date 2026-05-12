@@ -11,7 +11,8 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "readme-assets"
   ],
   "scripts": {
     "start": "bun run storybook",

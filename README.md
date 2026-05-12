@@ -1,16 +1,29 @@
 # @tscircuit/3d-viewer
 
-> [!NOTE]
-> We are working on a new vanilla THREE version of the 3d viewer, it's on the [v01 branch](https://github.com/tscircuit/3d-viewer/tree/v01)
 
-A 3D printed circuit board viewer for [Circuit JSON](https://github.com/tscircuit/circuit-json) and [tscircuit](https://github.com/tscircuit/tscircuit)
+An updated 3D printed circuit board viewer for [Circuit JSON](https://github.com/tscircuit/circuit-json) and [tscircuit](https://github.com/tscircuit/tscircuit)
 
-[![npm version](https://badge.fury.io/js/%40tscircuit%2F3d-viewer.svg)](https://badge.fury.io/js/%40tscircuit%2F3d-viewer)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+## Visual comparison
 
-[Documentation](https://docs.tscircuit.com) &middot; [Website](https://tscircuit.com) &middot; [Twitter](https://x.com/tscircuit) &middot; [Discord](https://tscircuit.com/community/join-redirect) &middot; [Quickstart](https://docs.tscircuit.com/quickstart) &middot; [Online Playground](https://tscircuit.com/playground)
+Same demo board (USB-C, tactile switch, **R1**, **LED**): **before** = upstream viewer, **after** = this fork.
 
-![image](https://github.com/user-attachments/assets/107624fc-f3e5-4652-a90e-a5462afa6fbe)
+| Before (original library) | After (this library) |
+| --- | --- |
+| ![Before: original 3d viewer](./readme-assets/before-original-viewer.png) | ![After: this library](./readme-assets/after-this-library.png) |
+
+## What changed in this fork
+
+**Rendering and materials.** The look of the viewer was rebuilt in passes: **lighting** and the **background grid** were updated, the **WebGL canvas** and **renderer** settings were tuned for clearer exposure and contrast, and the **board plus parts** (footprints, imported models, and board textures) were adjusted so everything reads more like real objects than flat shapes. Parts now pick up scene lighting in a more uniform way, and surface colors drive more believable **metal vs plastic** shading so resistors, connectors, and the board do not all look the same. **Board shading** was split so **painted textures** and **solid mesh** stay aligned instead of fighting each other.
+
+**Copper, board laminate, and solder mask.** **Copper** color is defined in one place and reused wherever copper appears in both **flat overlays** and **3D**, so the 2D layers and the 3D metal tint match. The **fiberglass edge** of the board uses explicit laminate coloring so the side of the PCB reads as stacked material, not one flat green slab. **Solder mask**, **height**, and **shininess** maps were expanded so mask, bumps, and copper interact: as you **orbit the camera**, you get more depth and specular variation on the green surface.
+
+**Engine simplification.** The old **Manifold-based** mesh path (used for some hole and via geometry) was **removed completely**. The viewer that ships now is built on **JSCAD** and **Three.js** only; the main viewer shell was rewired, dependencies and dev stories were cleaned up, and a large block of unused geometry code was deleted.
+
+**Silkscreen and labels.** Silkscreen and related overlays got a reliability pass: an outdated bounds helper was removed, and the pipelines that draw **silkscreen**, **mask**, **assembly notes**, and **fab notes** were rewired so **reference designators and text** land at **stable size and position**. The silkscreen Storybook example is the best quick visual check for label quality.
+
+**Camera and menus.** **Orbit**, **view presets**, and the **corner orientation control** were reworked so camera motion and preset jumps feel smoother and more predictable. During the parallel-branch period, the experimental UI and the main tree were kept in step so menus and the gizmo did not drift apart. A later pass simplified how the outer viewer wires into the **context menu** while keeping **camera presets**, **auto-rotate**, **export**, and **layer / appearance** toggles.
+
+**For app authors.** What you import and render—the main **viewer component**, **circuit JSON**, and **board markup**—stays the same idea as upstream even though the internals changed. Install and examples below.
 
 ## Features
 
@@ -177,15 +190,6 @@ For more complex or programmatically defined models, you can use JSCAD:
   }}
 />
 ```
-
-## Contributing
-
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for more details.
-
-## Related Projects
-
-- [Schematic Viewer](https://github.com/tscircuit/schematic-viewer)
-- [PCB Viewer](https://github.com/tscircuit/pcb-viewer)
 
 ## License
 
