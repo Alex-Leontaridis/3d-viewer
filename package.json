@@ -1,6 +1,6 @@
 {
   "name": "@aleontaridis/pcb-3d-viewer",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "React 3D PCB viewer for Circuit JSON",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
