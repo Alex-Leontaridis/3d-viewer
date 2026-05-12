@@ -1,7 +1,8 @@
-# @tscircuit/3d-viewer
+# @aleontaridis/pcb-3d-viewer
 
+**Built on top of** [`@tscircuit/3d-viewer`](https://www.npmjs.com/package/@tscircuit/3d-viewer) ([GitHub](https://github.com/tscircuit/3d-viewer)): same Circuit JSON / tscircuit integration model, with rendering and viewer UI changes described below.
 
-An updated 3D printed circuit board viewer for [Circuit JSON](https://github.com/tscircuit/circuit-json) and [tscircuit](https://github.com/tscircuit/tscircuit)
+An updated 3D printed circuit board viewer for [Circuit JSON](https://github.com/tscircuit/circuit-json) and [tscircuit](https://github.com/tscircuit/tscircuit).
 
 ## Visual comparison
 
@@ -35,7 +36,7 @@ Same demo board (USB-C, tactile switch, **R1**, **LED**): **before** = upstream 
 ## Installation
 
 ```bash
-npm install @tscircuit/3d-viewer
+npm install @aleontaridis/pcb-3d-viewer
 ```
 
 ## Usage
@@ -44,7 +45,7 @@ npm install @tscircuit/3d-viewer
 
 ```jsx
 import React from "react"
-import { CadViewer } from "@tscircuit/3d-viewer"
+import { CadViewer } from "@aleontaridis/pcb-3d-viewer"
 
 const MyPCBViewer = () => {
   return (
@@ -76,7 +77,7 @@ export default MyPCBViewer
 
 ```jsx
 import React from "react"
-import { CadViewer } from "@tscircuit/3d-viewer"
+import { CadViewer } from "@aleontaridis/pcb-3d-viewer"
 import mycircuitJsonData from "./mycircuitJsonpData.json"
 
 const MyPCBViewer = () => {
@@ -91,9 +92,11 @@ export default MyPCBViewer
 When using the SVG converter in Node.js environments, you'll need to provide JSDOM:
 
 ```typescript
-import { JSDOM } from 'jsdom'
-import { convert3dCircuitToSvg } from '@tscircuit/3d-viewer/3d'
-import { applyJsdomShim } from '@tscircuit/3d-viewer/utils'
+import { JSDOM } from "jsdom"
+import {
+  convertCircuitJsonTo3dSvg,
+  applyJsdomShim,
+} from "@aleontaridis/pcb-3d-viewer"
 
 // Setup JSDOM environment
 const dom = new JSDOM()
@@ -108,14 +111,14 @@ const options = {
   zoom: 50,
   camera: {
     position: { x: 0, y: 0, z: 100 },
-    lookAt: { x: 0, y: 0, z: 0 }
-  }
+    lookAt: { x: 0, y: 0, z: 0 },
+  },
 }
 
-const svgString = await convert3dCircuitToSvg(circuitJson, options)
+const svgString = await convertCircuitJsonTo3dSvg(circuitJson, options)
 ```
 
-The `convert3dCircuitToSvg` function accepts the following options:
+The `convertCircuitJsonTo3dSvg` function accepts the following options:
 - `width`: Width of the output SVG (default: 800)
 - `height`: Height of the output SVG (default: 600)
 - `backgroundColor`: Background color in hex format (default: "#ffffff")

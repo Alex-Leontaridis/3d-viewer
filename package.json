@@ -1,6 +1,6 @@
 {
-  "name": "@tscircuit/3d-viewer",
-  "version": "0.0.559",
+  "name": "@aleontaridis/pcb-3d-viewer",
+  "version": "1.0.0",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "type": "module",

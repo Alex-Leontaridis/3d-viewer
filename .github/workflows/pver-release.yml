@@ -6,8 +6,7 @@ on:
       - main
 env:
   UPSTREAM_REPO: "runframe" # for example: "eval"
-  PACKAGE_NAMES: "@tscircuit/3d-viewer" # comma-separated list, e.g. "@tscircuit/core,@tscircuit/props"
-
+  PACKAGE_NAMES: "@aleontaridis/pcb-3d-viewer"
 jobs:
   publish:
     runs-on: ubuntu-latest
